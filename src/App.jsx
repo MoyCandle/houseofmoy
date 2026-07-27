@@ -668,9 +668,9 @@ export default function MoyApp() {
   const itemTotal = isDrip ? (dripBoxes ? dripBoxes * dripBoxPrice(bean) : null) : beanPrice;
 
   const cartTotal = cart.reduce((s, i) => s + i.price, 0);
+  const cartCount = cart.length;
   const courierFee = cartCount >= 3 ? 0 : 75;
   const orderTotal = cartTotal + courierFee;
-  const cartCount = cart.length;
 
   const pct = Math.round(((step + 1) / steps.length) * 100);
 
