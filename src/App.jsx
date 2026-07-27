@@ -668,6 +668,8 @@ export default function MoyApp() {
   const itemTotal = isDrip ? (dripBoxes ? dripBoxes * dripBoxPrice(bean) : null) : beanPrice;
 
   const cartTotal = cart.reduce((s, i) => s + i.price, 0);
+  const courierFee = cartCount >= 3 ? 0 : 75;
+  const orderTotal = cartTotal + courierFee;
   const cartCount = cart.length;
 
   const pct = Math.round(((step + 1) / steps.length) * 100);
@@ -747,8 +749,8 @@ export default function MoyApp() {
       customer_name: `${form.firstName} ${form.lastName}`,
       customer_email: form.email,
       customer_phone: form.phone,
-      order_items: buildOrderSummary(),
-      order_total: `R${cartTotal}`,
+      order_items: buildOrderSummary() + `\n- Courier Fee: R${courierFee}${courierFee === 0 ? " (free, 3+ items)" : ""}`,
+      order_total: `R${orderTotal}`,
       payment_method: payMethod,
       delivery_address: `${form.street}, ${form.suburb}, ${form.city}, ${form.province}, ${form.postal}`,
       owner_email: EMAIL_CONFIG.ownerEmail,
@@ -823,13 +825,9 @@ export default function MoyApp() {
           <div className="landing-greeting">Hello jou Moy ding</div>
         </div>
         <div className="landing-split">
-          <button className="landing-panel candles" onClick={goCandles}>
+          <button className="landing-panel candles" style={{ flex:1 }} onClick={goCandles}>
             <span className="landing-panel-sub">MOY</span>
             <span className="landing-panel-label">Candles</span>
-          </button>
-          <button className="landing-panel coffee" onClick={goCoffee}>
-            <span className="landing-panel-sub">MOY</span>
-            <span className="landing-panel-label">Coffee</span>
           </button>
         </div>
 
@@ -876,9 +874,16 @@ export default function MoyApp() {
                 </div>
               );
             })}
+            <div className="oss" style={{ marginBottom:8, borderRadius:18 }}>
+              <div>
+                <div className="oss-lbl">Delivery</div>
+                <div className="oss-detail">{courierFee === 0 ? "Courier Fee — free (3+ items)" : "Courier Fee"}</div>
+              </div>
+              <div className="oss-price">R{courierFee}</div>
+            </div>
             <div className="cart-total-bar" style={{ marginTop:12 }}>
               <div><div className="cart-total-lbl">Total Paid</div></div>
-              <div className="cart-total-val">R{cartTotal}</div>
+              <div className="cart-total-val">R{orderTotal}</div>
             </div>
           </div>
           <button className="btn-cta" style={{ maxWidth:280, width:"100%", marginTop:16 }} onClick={resetAll}>New Order</button>
@@ -913,9 +918,16 @@ export default function MoyApp() {
               </div>
             );
           })}
+          <div className="oss" style={{ marginBottom:8, borderRadius:18 }}>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div className="oss-lbl">Delivery</div>
+              <div className="oss-detail">{courierFee === 0 ? "Courier Fee — free (3+ items)" : "Courier Fee"}</div>
+            </div>
+            <div className="oss-price">R{courierFee}</div>
+          </div>
           <div className="cart-total-bar" style={{ marginBottom:0 }}>
             <div><div className="cart-total-lbl">Order Total</div></div>
-            <div className="cart-total-val">R{cartTotal}</div>
+            <div className="cart-total-val">R{orderTotal}</div>
           </div>
 
           <div className="co-sec-title">Personal Details</div>
@@ -1340,7 +1352,6 @@ export default function MoyApp() {
                   </div>
                   <button className="btn-place" onClick={() => setCheckout(true)}>Proceed to Checkout</button>
                   <button className="btn-back" style={{ width:"100%", marginTop:10, height:44, textAlign:"center" }} onClick={goCandles}>Shop Candles</button>
-                  <button className="btn-back" style={{ width:"100%", marginTop:8, height:44, textAlign:"center" }} onClick={goCoffee}>Shop Coffee</button>
                 </>
               )}
             </div>
