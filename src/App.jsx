@@ -331,8 +331,8 @@ const DripSteps = () => {
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: radial-gradient(ellipse at 50% -10%, #FAF6F3 0%, #F3EDE8 55%, #EBE1D9 100%); color: #1a1a1a; font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; }
-  .app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: radial-gradient(ellipse at 50% -10%, #FAF6F3 0%, #F3EDE8 55%, #EBE1D9 100%); padding-bottom: 80px; }
+  body { background: #f2f0ec; color: #1a1a1a; font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; }
+  .app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: #f2f0ec; padding-bottom: 80px; }
   .hdr { padding: 52px 24px 0; display: flex; justify-content: space-between; align-items: center; }
   .wordmark { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 300; font-size: 1.9rem; letter-spacing: 6px; color: #8A4332; line-height: 1; }
   .wordmark-letter-wide { display: inline-block; }
