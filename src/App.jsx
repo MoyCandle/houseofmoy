@@ -7,10 +7,10 @@ import emailjs from "@emailjs/browser";
 // 2. Create two templates (customer confirmation + owner notification) → gives you two TEMPLATE_IDs
 // 3. Account → General → Public Key → gives you PUBLIC_KEY
 const EMAIL_CONFIG = {
-  serviceId: "YOUR_SERVICE_ID",
-  customerTemplateId: "YOUR_CUSTOMER_TEMPLATE_ID",
-  ownerTemplateId: "YOUR_OWNER_TEMPLATE_ID",
-  publicKey: "YOUR_PUBLIC_KEY",
+  serviceId: "service_kmqdmro",
+  customerTemplateId: "template_12qo6nn",
+  ownerTemplateId: "template_tahomjp",
+  publicKey: "pvCYmNSbNG_F8yrum",
   ownerEmail: "altemoy@gmail.com",
 };
 
