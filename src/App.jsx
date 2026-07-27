@@ -529,7 +529,7 @@ const css = `
   .btn-place:disabled { background: rgba(131,131,131,0.3); color: rgba(131,131,131,0.5); box-shadow: none; cursor: not-allowed; transform: none; }
   .success { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; }
   .success-ring { width: 80px; height: 80px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 24px; background: linear-gradient(155deg, #F3DCD5, #D89488); box-shadow: 8px 8px 18px rgba(217,173,173,0.4), -6px -6px 14px rgba(255,255,255,0.85), inset 0 1px 0 rgba(255,255,255,0.6); }
-  .success-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.1rem; letter-spacing: -0.03em; color: #8A4332; line-height: 1; margin-bottom: 12px; text-shadow: 0 1px 0 #A85D45, 0 2px 0 #8F4A38, 0 3px 6px rgba(156,71,34,0.35); }
+  .success-title { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 300; font-size: 2.1rem; letter-spacing: 0.02em; color: #8A4332; line-height: 1; margin-bottom: 12px; }
   .success-sub { font-size: 0.98rem; font-weight: 300; color: #6B4A42; line-height: 1.7; margin-bottom: 32px; }
   .cart-hdr { padding: 52px 24px 0; display: flex; justify-content: space-between; align-items: center; }
   .cart-item { background: linear-gradient(155deg, #FFFFFF, #F7E9E3); border-radius: 22px; border: 1px solid rgba(255,255,255,0.9); padding: 16px 18px; margin-bottom: 10px; box-shadow: 8px 8px 18px rgba(217,173,173,0.24), -6px -6px 14px rgba(255,255,255,0.85); position: relative; }
