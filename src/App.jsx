@@ -568,6 +568,7 @@ const css = `
   .landing-cart-pill { position: absolute; top: 22px; right: 22px; z-index: 5; background: rgba(46,42,42,0.9); color: #fff; border: none; border-radius: 30px; padding: 8px 16px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,0.25); }
   .landing-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 40px 24px; }
   .landing-logo { width: 180px; max-width: 60%; }
+  .landing-wordmark { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 300; font-size: 3.2rem; letter-spacing: 6px; color: #8A4332; line-height: 1; text-align: center; }
   .landing-greeting { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 300; font-size: 1.1rem; letter-spacing: 0.12em; color: #6B4A42; text-align: center; }
   .landing-split { display: flex; gap: 16px; width: 100%; padding: 0 20px 30px; height: 34vh; min-height: 210px; box-sizing: border-box; }
   .landing-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 28px; cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); position: relative; }
@@ -834,7 +835,7 @@ export default function MoyApp() {
           </button>
         )}
         <div className="landing-center">
-          <img src={IMAGES["1.png"]} alt="Moy" className="landing-logo" />
+          <div className="landing-wordmark"><Wordmark /></div>
           <div className="landing-greeting">Hello jou Moy ding</div>
         </div>
         <div className="landing-split">
@@ -846,7 +847,7 @@ export default function MoyApp() {
 
         <div className="landing-contact">
           <div className="contact-row">
-            <a href="tel:0660222527" className="contact-link">066 022 2527</a>
+            <a href="https://wa.me/27660222527" target="_blank" rel="noreferrer" className="contact-link">066 022 2527</a>
             <span className="contact-dot">·</span>
             <a href="mailto:altemoy@gmail.com" className="contact-link">altemoy@gmail.com</a>
           </div>
