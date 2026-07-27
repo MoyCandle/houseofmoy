@@ -644,7 +644,7 @@ export default function MoyApp() {
   const [candleSel, setCandleSel] = useState({});
   const [checkout,  setCheckout]  = useState(false);
   const [done,      setDone]      = useState(false);
-  const [payMethod, setPayMethod] = useState("card");
+  const [payMethod, setPayMethod] = useState("eft");
   const [msgs,      setMsgs]      = useState(MSGS);
   const [liked,     setLiked]     = useState([]);
   const [newMsg,    setNewMsg]    = useState("");
@@ -683,8 +683,7 @@ export default function MoyApp() {
   ];
 
   const formOk = form.firstName && form.lastName && form.email && form.phone &&
-    form.street && form.suburb && form.city && form.province && form.postal &&
-    (payMethod !== "card" || (form.cardName && form.cardNum && form.cardExpiry && form.cardCvv));
+    form.street && form.suburb && form.city && form.province && form.postal;
 
   const showToast = (msg) => {
     setToast(msg);
@@ -968,53 +967,11 @@ export default function MoyApp() {
           </div>
 
           <div className="co-sec-title">Payment Method</div>
-          <div className="pay-grid">
-            {[{ id:"card", icon:"💳", label:"Card" }, { id:"eft", icon:"🏦", label:"EFT" }, { id:"snapscan", icon:"📱", label:"SnapScan" }, { id:"zapper", icon:"⚡", label:"Zapper" }].map(p => (
-              <div key={p.id} className={"pay-btn" + (payMethod === p.id ? " active" : "")} onClick={() => setPayMethod(p.id)}>
-                <div className="pay-icon">{p.icon}</div>
-                <span className="pay-lbl">{p.label}</span>
-              </div>
+          <div className="eft-box">
+            {[["Bank","FNB"],["Account Name","Moy Coffee"],["Account No","62 000 000 000"],["Branch Code","250 655"],["Reference", form.lastName || "Your Surname"]].map(([k,v]) => (
+              <div key={k} className="eft-row"><span className="eft-key">{k}</span><span className="eft-val">{v}</span></div>
             ))}
           </div>
-
-          {payMethod === "card" && (
-            <div className="field-group">
-              <div className="field-wrap">
-                <label className="field-lbl">Name on Card</label>
-                <input className="field-input" placeholder="Jane Smith" value={form.cardName} onChange={e => setF("cardName", e.target.value)} />
-              </div>
-              <div className="field-wrap">
-                <label className="field-lbl">Card Number</label>
-                <input className="field-input" placeholder="0000 0000 0000 0000" maxLength={19} value={form.cardNum} onChange={e => setF("cardNum", e.target.value.replace(/[^0-9]/g, "").replace(/(.{4})/g, "$1 ").trim())} />
-              </div>
-              <div className="field-row">
-                <div className="field-wrap">
-                  <label className="field-lbl">Expiry</label>
-                  <input className="field-input" placeholder="MM/YY" maxLength={5} value={form.cardExpiry} onChange={e => { let v = e.target.value.replace(/[^0-9]/g, ""); if (v.length >= 3) v = v.slice(0,2) + "/" + v.slice(2,4); setF("cardExpiry", v); }} />
-                </div>
-                <div className="field-wrap">
-                  <label className="field-lbl">CVV</label>
-                  <input className="field-input" placeholder="123" maxLength={4} type="password" value={form.cardCvv} onChange={e => setF("cardCvv", e.target.value.replace(/[^0-9]/g, ""))} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {payMethod === "eft" && (
-            <div className="eft-box">
-              {[["Bank","FNB"],["Account Name","Moy Coffee"],["Account No","62 000 000 000"],["Branch Code","250 655"],["Reference", form.lastName || "Your Surname"]].map(([k,v]) => (
-                <div key={k} className="eft-row"><span className="eft-key">{k}</span><span className="eft-val">{v}</span></div>
-              ))}
-            </div>
-          )}
-
-          {(payMethod === "snapscan" || payMethod === "zapper") && (
-            <div className="eft-box" style={{ textAlign:"center", padding:24 }}>
-              <div style={{ fontSize:"3rem", marginBottom:12 }}>{payMethod === "snapscan" ? "📱" : "⚡"}</div>
-              <div style={{ fontFamily:"Syne,sans-serif", fontWeight:700, fontSize:"1rem", color:DARK, marginBottom:6 }}>{payMethod === "snapscan" ? "Scan with SnapScan" : "Scan with Zapper"}</div>
-              <div style={{ fontSize:"0.92rem", fontWeight:300, color:TEAL }}>QR code will be sent to your email once your order is confirmed.</div>
-            </div>
-          )}
 
           <button className="btn-place" disabled={!formOk || sending} onClick={handlePlaceOrder}>{sending ? "Sending confirmation…" : "Confirm & Place Order"}</button>
         </div>
