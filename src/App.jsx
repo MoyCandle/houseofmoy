@@ -826,6 +826,8 @@ export default function MoyApp() {
       isDiffuser,
     };
     setCart(cc => [...cc, newItem]);
+    setTab("cart");
+    setView("candles");
     showToast(`${c.brand} added`);
   };
 
