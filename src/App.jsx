@@ -1306,14 +1306,10 @@ export default function MoyApp() {
                     <div className="summary-label">Courier delivery</div>
                     <div className="summary-value">{deliveryFee === 0 ? "Free" : `R${deliveryFee}`}</div>
                   </div>
-                  <div className="cart-total-bar">
-                    <div>
-                      <div className="cart-total-lbl">{cartCount} item{cartCount !== 1 ? "s" : ""} · Order Total</div>
-                    </div>
+                  <div className="cart-total-bar" style={{ marginTop: 10 }}>
+                    <div><div className="cart-total-lbl">Order Total</div></div>
                     <div className="cart-total-val">R{orderTotal}</div>
                   </div>
-                  <button className="btn-place" onClick={() => setCheckout(true)}>Proceed to Checkout</button>
-                  <button className="btn-back" style={{ width:"100%", marginTop:10, height:44, textAlign:"center" }} onClick={goCandles}>Shop Candles</button>
                 </>
               )}
             </div>
