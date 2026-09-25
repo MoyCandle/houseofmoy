@@ -1310,11 +1310,11 @@ export default function MoyApp() {
                     <div><div className="cart-total-lbl">Order Total</div></div>
                     <div className="cart-total-val">R{orderTotal}</div>
                   </div>
-                </>
+                
               )}
+            <Nav/>
             </div>
-            <Nav />
-          </>
+        </>
         )}
 
         {tab === "community" && (
