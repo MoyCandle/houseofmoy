@@ -1478,7 +1478,7 @@ export default function MoyApp() {
                   })}
                   <div className="summary-line">
                     <div className="summary-label">Courier delivery</div>
-                    <div className="summary-value">{deliveryFee === 0 ? "Free" : `R${deliveryFee}`}</div>
+                    <div className="summary-value">{courierFee === 0 ? "Free" : `R${courierFee}`}</div>
                   </div>
                   <div className="cart-total-bar" style={{ marginTop: 10 }}>
                     <div><div className="cart-total-lbl">Order Total</div></div>
