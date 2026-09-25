@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
+  <text x="90" y="70" text-anchor="middle" font-size="85" fill="#1A1A1A" font-weight="300" font-family="Helvetica Neue, Arial, sans-serif" transform="translate(90,0) scale(0.85,1) translate(-90,0)">M</text>
+  <text x="150" y="70" text-anchor="middle" font-size="85" fill="#1A1A1A" font-weight="300" font-family="Helvetica Neue, Arial, sans-serif">O</text>
+  <text x="199" y="70" text-anchor="middle" font-size="85" fill="#1A1A1A" font-weight="300" font-family="Helvetica Neue, Arial, sans-serif" transform="translate(199,0) scale(0.85,1) translate(-199,0)">Y</text>
+</svg>
