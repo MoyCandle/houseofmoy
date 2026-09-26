@@ -1113,7 +1113,7 @@ export default function MoyApp() {
 
           <div className="co-sec-title">Payment Method</div>
           <div className="eft-box">
-            {[["Bank","FNB"],["Account Name","Moy Coffee"],["Account No","62 000 000 000"],["Branch Code","250 655"],["Reference", form.lastName || "Your Surname"]].map(([k,v]) => (
+            {[["Bank","Capitec Business"],["Account Name","Moy Design"],["Account No","1052871895"],["Branch Code","450105"],["Reference", form.lastName || "Your Surname"]].map(([k,v]) => (
               <div key={k} className="eft-row"><span className="eft-key">{k}</span><span className="eft-val">{v}</span></div>
             ))}
           </div>
