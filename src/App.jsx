@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import emailjs from "@emailjs/browser";
+import { CANDLE_PRICES, DIFFUSER_PRICE, courierFeeFor } from "./pricing.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // Fill these in from your EmailJS dashboard (emailjs.com).
@@ -61,7 +62,7 @@ const candles = [
     mood: "The emotion of stillness without emptiness. It's peace with depth. It's softness with strength.",
     notes: { top: "Pineapple, Melon, Bergamot", middle: "Lavender, Jasmine", base: "Amber, Cedarwood" },
     story: null,
-    sizes: { 200:{ price:250, burn:"25 hrs", space:"Intimate small space" }, 300:{ price:350, burn:"40 hrs", space:"Suitable for bigger areas" } },
+    sizes: { 200:{ price:CANDLE_PRICES[1][200], burn:"25 hrs", space:"Intimate small space" }, 300:{ price:CANDLE_PRICES[1][300], burn:"40 hrs", space:"Suitable for bigger areas" } },
   },
   {
     id: 2, brand: "Woestyn", tagline: "Wild Stillness",
@@ -69,7 +70,7 @@ const candles = [
     mood: "Warm, cozy and intimate. Perfect for those stay-at-home Friday nights when all you want to do is unwind and indulge in some me-time.",
     notes: { top: "Earthy, herbaceous", middle: "Woody, floral", base: "Woody warmth that deepens as it burns" },
     story: "As the candle burns, the fragrance evolves and the notes blend together in harmony — complex and alluring, both grounding and uplifting.",
-    sizes: { 200:{ price:250, burn:"25 hrs", space:"Intimate small space" }, 300:{ price:350, burn:"40 hrs", space:"Suitable for bigger areas" } },
+    sizes: { 200:{ price:CANDLE_PRICES[2][200], burn:"25 hrs", space:"Intimate small space" }, 300:{ price:CANDLE_PRICES[2][300], burn:"40 hrs", space:"Suitable for bigger areas" } },
   },
   {
     id: 3, brand: "Feestelik", tagline: "Warm Embrace",
@@ -77,7 +78,7 @@ const candles = [
     mood: "A whimsical accomplice to stolen moments of indulgence.",
     notes: { top: "Juicy crisp pear", middle: "Creamy baked-good warmth", base: "Warm amber, sweet vanilla" },
     story: "Be transported to a sugar-dusted haven where even the air tastes like a hug from your grandmother's oven.",
-    sizes: { 200:{ price:250, burn:"25 hrs", space:"Intimate small space" }, 300:{ price:350, burn:"40 hrs", space:"Suitable for bigger areas" } },
+    sizes: { 200:{ price:CANDLE_PRICES[3][200], burn:"25 hrs", space:"Intimate small space" }, 300:{ price:CANDLE_PRICES[3][300], burn:"40 hrs", space:"Suitable for bigger areas" } },
   },
   {
     id: 4, brand: "Roosevelt", tagline: "Poised Elegance",
@@ -88,7 +89,7 @@ const candles = [
     mood: "Romantic solace — a rather serene and comforting one.",
     notes: { top: "Invigorating citrus", middle: "Floral romance", base: "Warm woody depth" },
     story: "Be transported to a world of enchantment and love, surrounded by the intoxicating scent of love and magic.",
-    sizes: { 200:{ price:280, burn:"25 hrs", space:"Intimate small space" }, 300:{ price:380, burn:"40 hrs", space:"Suitable for bigger areas" } },
+    sizes: { 200:{ price:CANDLE_PRICES[4][200], burn:"25 hrs", space:"Intimate small space" }, 300:{ price:CANDLE_PRICES[4][300], burn:"40 hrs", space:"Suitable for bigger areas" } },
   },
   {
     id: 5, brand: "Sosie", tagline: "Blush Radiance",
@@ -96,7 +97,7 @@ const candles = [
     mood: "\u201CRooms of spectacular opulence.\u201D Evokes feelings of joy, happiness and contentment.",
     notes: { top: "Crisp citrus, fruity", middle: "Floral, fruity", base: "Sweet, bubbly musk" },
     story: "Transport your space to a world of elegance and celebration.",
-    sizes: { 200:{ price:250, burn:"25 hrs", space:"Intimate small space" }, 300:{ price:350, burn:"40 hrs", space:"Suitable for bigger areas" } },
+    sizes: { 200:{ price:CANDLE_PRICES[5][200], burn:"25 hrs", space:"Intimate small space" }, 300:{ price:CANDLE_PRICES[5][300], burn:"40 hrs", space:"Suitable for bigger areas" } },
   },
   {
     id: 6, brand: "Baka", tagline: "Rooted Clarity",
@@ -104,7 +105,7 @@ const candles = [
     mood: "Be transported to a secluded Mediterranean terrace at dusk, where citrus trees perfume the air, warm stone walls hold the day's heat, and a soft breeze carries the promise of an unforgettable night.",
     notes: { top: "Lime, Basil, Mandarin, Orange zest", middle: "Black pepper, Geranium, Lilac, Thyme", base: "Moss, Patchouli, Musk, White Cedar" },
     story: null,
-    sizes: { 200:{ price:250, burn:"25 hrs", space:"Intimate small space" }, 300:{ price:350, burn:"40 hrs", space:"Suitable for bigger areas" } },
+    sizes: { 200:{ price:CANDLE_PRICES[6][200], burn:"25 hrs", space:"Intimate small space" }, 300:{ price:CANDLE_PRICES[6][300], burn:"40 hrs", space:"Suitable for bigger areas" } },
   },
 ];
 
@@ -341,10 +342,10 @@ const DripSteps = () => {
 };
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Syne:wght@700;800&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #F2F0EC; color: #2E2A2A; font-family: 'Barlow Condensed', sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; }
-  .app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: #F2F0EC; padding-bottom: 80px; }
+  .app { width: min(100%, 1280px); max-width: 1280px; margin: 0 auto; min-height: 100vh; background: #F2F0EC; padding-bottom: 80px; }
   .hdr { padding: 52px 24px 0; display: flex; justify-content: space-between; align-items: center; }
   .wordmark { width: 116px; height: auto; display: block; object-fit: contain; filter: drop-shadow(0 1px 0 #A85D45) drop-shadow(0 2px 4px rgba(156,71,34,0.3)); }
   .wordmark-sub { font-size: 0.82rem; font-weight: 300; letter-spacing: 0.4em; text-transform: uppercase; color: #6A6060; margin-top: 3px; }
@@ -501,20 +502,35 @@ const css = `
   .nav-lbl { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #1A1A1A; font-family: 'Barlow Condensed', sans-serif; transition: color 0.2s; }
   .nav-tab.active .nav-lbl { color: #1A1A1A; }
   .nav-badge { position: absolute; top: 8px; right: 18px; width: 17px; height: 17px; border-radius: 50%; background: #8A4332; color: white; font-size: 0.6rem; font-weight: 700; font-family: 'Syne', sans-serif; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(138,67,50,0.4); }
-  .order-btm { position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; padding: 12px 20px 14px; background: linear-gradient(to top, #E8C9C2 70%, transparent); display: flex; gap: 10px; z-index: 45; }
+  .order-btm { position: sticky; top: 90px; left: auto; transform: none; width: calc(100% - 32px); max-width: 430px; margin: 12px auto 0; padding: 12px 20px 14px; background: linear-gradient(to top, #E8C9C2 70%, transparent); display: flex; gap: 10px; z-index: 45; border-radius: 20px 20px 0 0; }
   .btn-back { background: linear-gradient(155deg, #FFFFFF, #F7E9E3); border: none; border-radius: 16px; padding: 0 18px; height: 52px; font-family: 'Barlow Condensed', sans-serif; font-weight: 300; font-size: 0.95rem; letter-spacing: 0.15em; color: #2B2624; cursor: pointer; transition: all 0.2s; box-shadow: 6px 6px 14px rgba(217,173,173,0.3), -5px -5px 12px rgba(255,255,255,0.9); }
   .btn-back:hover { color: #C35F66; }
   .btn-back:active { box-shadow: inset 3px 3px 7px rgba(217,173,173,0.3), inset -2px -2px 6px rgba(255,255,255,0.6); transform: translateY(1px); }
-  .moy-page { padding: 28px 20px 150px; }
+  .moy-page {
+    position: relative;
+    padding: 28px 20px 150px;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow: hidden;
+  }
   .moy-story-card {
     position: relative;
-    background: #F2F0EC;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 430px;
+    height: min(54vw, 470px);
+    margin-top: 0;
+    background: transparent;
     border-radius: 28px;
-    border: 1px solid rgba(255,255,255,0.9);
-    padding: 24px 20px 26px;
-    box-shadow: 10px 10px 22px rgba(180,140,140,0.28), -8px -8px 18px rgba(255,255,255,0.9);
-    min-height: 520px;
+    border: none;
+    padding: 0;
+    box-shadow: none;
     overflow: hidden;
+    z-index: 0;
   }
   .moy-story-image {
     position: absolute;
@@ -528,6 +544,7 @@ const css = `
     opacity: 1;
     filter: none;
     z-index: 0;
+    background: rgba(255,255,255,0.2);
   }
   .moy-story-overlay {
     position: absolute;
@@ -619,6 +636,93 @@ const css = `
   .cart-empty-title { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 700; font-size: 1.3rem; color: #1A1A1A; margin-bottom: 8px; }
   .cart-empty-sub { font-size: 0.95rem; font-weight: 300; color: #6B4A42; line-height: 1.5; }
   .added-toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: linear-gradient(155deg, #3A332F, #211C1A); color: white; border-radius: 30px; padding: 12px 22px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.95rem; font-weight: 400; letter-spacing: 0.1em; box-shadow: 0 8px 24px rgba(0,0,0,0.22); z-index: 100; display: flex; align-items: center; gap: 10px; animation: slideDown 0.35s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; }
+  .pay-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .pay-main { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.08em; color: #1a1a1a; }
+  .pay-btn.active .pay-main { color: #FFFFFF; }
+  .pay-error { margin-top: 12px; background: #FBEDEC; border: 1px solid rgba(195,95,102,0.35); color: #8A4332; border-radius: 14px; padding: 12px 14px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; line-height: 1.45; }
+
+  /* ── Our Process ── */
+  .proc-app { padding-bottom: 0; background: #FFFFFF; }
+  .proc-hero { position: relative; min-height: 460px; display: flex; align-items: center; background-color: #FFFFFF; overflow: hidden; }
+  .proc-hero-img { position: absolute; top: 0; right: 0; width: 58%; height: 100%; object-fit: cover; object-position: 50% 64%; -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 22%); mask-image: linear-gradient(90deg, transparent 0%, #000 22%); }
+  .proc-hero-fade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.92) 34%, rgba(255,255,255,0.35) 58%, rgba(255,255,255,0) 75%); }
+  .proc-hero-copy { position: relative; z-index: 1; max-width: 420px; padding: 56px 0 56px 7.5%; }
+  .proc-eyebrow { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase; color: #3C4241; margin-bottom: 16px; }
+  .proc-title { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(2.6rem, 5.4vw, 3.8rem); line-height: 1.02; letter-spacing: -0.01em; color: #1a1a1a; margin-bottom: 26px; }
+  .proc-title em { font-style: italic; }
+  .proc-intro { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.86rem; line-height: 1.75; letter-spacing: 0.04em; color: #3C4241; }
+  .proc-rule { width: 42px; height: 1px; background: #3C4241; opacity: 0.6; margin-top: 26px; }
+  .proc-steps { padding: 34px 7.5% 30px; display: flex; flex-direction: column; gap: 16px; }
+  .proc-step { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 16px 48px; }
+  .proc-step.flip .proc-photo { order: 2; }
+  .proc-step.flip .proc-text { order: 1; }
+  .proc-photo { border-radius: 22px; overflow: hidden; background: #E9E2D8; }
+  .proc-photo img { width: 100%; height: auto; display: block; }
+  .proc-text { padding: 18px 0; max-width: 380px; }
+  .proc-num { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+  .proc-num span { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: 1.9rem; color: #3C4241; line-height: 1; }
+  .proc-num i { width: 42px; height: 1px; background: #3C4241; opacity: 0.6; }
+  .proc-step-title { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase; color: #1a1a1a; margin-bottom: 14px; }
+  .proc-body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.84rem; line-height: 1.75; letter-spacing: 0.03em; color: #3C4241; }
+  .proc-body + .proc-body { margin-top: 10px; }
+  .proc-band { background: #1F1D1C; color: #F4F1EC; text-align: center; padding: 34px 20px 38px; margin-top: 10px; }
+  .proc-band-eyebrow { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.66rem; letter-spacing: 0.32em; text-transform: uppercase; opacity: 0.85; }
+  .proc-band-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2rem; margin-top: 8px; }
+  .proc-band-rule { width: 42px; height: 1px; background: #F4F1EC; opacity: 0.6; margin: 16px auto 22px; }
+  .proc-band-tags { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; }
+  .proc-band-tags b { font-weight: 300; margin: 0 12px; opacity: 0.7; }
+  @media (max-width: 768px) {
+    .proc-hero { min-height: 0; flex-direction: column; align-items: stretch; }
+    .proc-hero-img { position: static; order: 2; width: 100%; height: 280px; -webkit-mask-image: none; mask-image: none; }
+    .proc-hero-fade { display: none; }
+    .proc-hero-copy { max-width: none; padding: 36px 20px 28px; }
+    .proc-steps { padding: 26px 16px 20px; gap: 30px; }
+    .proc-step { grid-template-columns: 1fr; gap: 14px; }
+    .proc-step.flip .proc-photo, .proc-step .proc-photo { order: 0; }
+    .proc-step.flip .proc-text, .proc-step .proc-text { order: 1; }
+    .proc-text { padding: 0 4px; max-width: none; }
+    .proc-band-tags b { margin: 0 6px; }
+  }
+
+  @media (min-width: 900px) {
+    .app { width: min(100%, 1280px); }
+    .landing { padding: 20px 0 0; }
+    .landing-split { max-width: 980px; margin: 0 auto; height: 28vh; min-height: 260px; }
+    .landing-panel { min-height: 230px; }
+    .landing-center { padding-top: 28px; }
+    .landing-gallery { padding: 0 20px; }
+  }
+  @media (max-width: 768px) {
+    .app { width: 100%; max-width: none; }
+    .top-header { gap: 8px; padding-left: 14px; padding-right: 14px; }
+    .top-header-left, .top-header-right { flex: 0 0 auto; }
+    .top-header-tabs { gap: 8px; }
+    .top-header-tab { font-size: 0.62rem; letter-spacing: 0.12em; padding: 7px 6px; }
+    .top-header-action { min-width: 72px; padding: 0 10px; font-size: 0.6rem; letter-spacing: 0.12em; }
+    .landing-hero { flex-direction: column; padding-top: 20px; }
+    .landing-copy { align-items: center; text-align: center; max-width: 100%; }
+    .landing-greeting { text-align: center; }
+    .landing-visual-wrap { flex-basis: auto; width: min(100%, 520px); margin: 14px 0 24px; }
+    .landing-main-image { width: 100%; }
+    .landing-center { padding: 32px 18px 12px; }
+    .landing-split { padding: 0 16px 24px; gap: 12px; height: auto; min-height: 180px; }
+    .landing-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0 16px; }
+    .landing-panel-label { font-size: 1.12rem; }
+    .hdr { padding: 32px 18px 0; }
+    .hero, .prog-wrap, .sec { padding-left: 16px; padding-right: 16px; }
+    .sec { padding-bottom: 90px; }
+  }
+  @media (max-width: 520px) {
+    .top-header { flex-wrap: wrap; padding-top: 14px; }
+    .top-header-left { order: 1; }
+    .top-header-tabs { order: 2; width: 100%; justify-content: center; flex-wrap: wrap; }
+    .top-header-right { order: 3; }
+    .landing-greeting.primary { letter-spacing: 0.08em; }
+    .landing-greeting.secondary { letter-spacing: 0.04em; }
+    .landing-gallery { grid-template-columns: 1fr; }
+    .landing-gallery-card img { height: 180px; }
+    .landing-panel { border-radius: 20px; }
+  }
   @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-16px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
   .candle-card { padding: 18px; margin-bottom: 14px; cursor: default; }
   .candle-card:hover { transform: none; box-shadow: 10px 10px 22px rgba(180,140,140,0.3), -8px -8px 18px rgba(255,255,255,0.9); }
@@ -637,28 +741,33 @@ const css = `
 
   .landing { display: flex; flex-direction: column; justify-content: space-between; padding: 0; position: relative; }
   .landing-cart-pill { position: absolute; top: 22px; right: 22px; z-index: 5; background: rgba(46,42,42,0.9); color: #fff; border: none; border-radius: 30px; padding: 8px 16px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,0.25); }
-  .landing-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 40px 24px 14px; }
+  .top-header { width: min(100%, 1280px); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px 0; margin: 0 auto; }
+  .top-header-left { flex: 1; display: flex; align-items: center; justify-content: flex-start; }
+  .top-header-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .top-header-logo { width: 110px; height: auto; display: block; }
+  .top-header-tabs { flex: 1; display: flex; align-items: center; justify-content: center; gap: 18px; }
+  .top-header-tab { border: none; background: transparent; color: #2B2624; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 0.82rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 8px 10px; border-radius: 999px; transition: background 0.2s ease, color 0.2s ease; }
+  .top-header-tab:hover { background: rgba(195,95,102,0.08); color: #C35F66; }
+  .top-header-action { display: inline-flex; align-items: center; justify-content: center; min-width: 86px; height: 40px; padding: 0 16px; border: 1px solid rgba(43,38,36,0.12); border-radius: 999px; background: rgba(255,255,255,0.5); color: #2B2624; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 0.82rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 14px rgba(180,140,140,0.12); }
+  .top-header-action.cart { min-width: 94px; position: relative; }
+  .top-header-action .cart-badge { position: absolute; top: -6px; right: 8px; min-width: 18px; height: 18px; border-radius: 50%; background: #C35F66; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.58rem; font-family: 'Syne', sans-serif; font-weight: 700; padding: 0 4px; }
+  .landing-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px 24px 14px; }
+  .landing-hero { width: min(100%, 1280px); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 26px; padding: 6vh 24px 14px; }
+  .landing-copy { flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; max-width: 520px; }
   .landing-logo { width: 210px; max-width: 68%; display: block; margin-bottom: 0; }
-  .landing-greeting { font-family: 'Barlow Condensed', sans-serif; font-weight: 300; font-size: 1.1rem; letter-spacing: 0.12em; color: #6B4A42; text-align: center; margin-top: -4px; line-height: 1; }
-  .landing-split { display: flex; gap: 16px; width: 100%; padding: 0 20px 30px; height: 34vh; min-height: 210px; box-sizing: border-box; }
-  .landing-panel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 28px; cursor: pointer; transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); position: relative; overflow: hidden; }
-  .landing-panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 28px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.22), rgba(255,255,255,0.02));
-    pointer-events: none;
-  }
-  .landing-panel-sub { font-family: 'Barlow Condensed', sans-serif; font-weight: 300; font-size: 0.82rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
-  .landing-panel-label { position: relative; z-index: 1; font-family: 'Bison', 'Arial Black', sans-serif; font-weight: 800; font-size: 1.5rem; letter-spacing: -0.01em; color: #fff; text-align: center; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.25); }
-  .landing-panel.candles { background: linear-gradient(155deg, #C06D71, #B85F64); box-shadow: 10px 10px 22px rgba(192,109,113,0.28), -7px -7px 16px rgba(255,255,255,0.38), inset 0 1px 0 rgba(255,255,255,0.12); }
-  .landing-panel.coffee { background: linear-gradient(155deg, #C35F66, #C35F66); box-shadow: 10px 10px 22px rgba(180,140,140,0.42), -7px -7px 16px rgba(255,255,255,0.75), inset 0 1px 0 rgba(255,255,255,0.4); }
-  .landing-panel:hover { transform: translateY(-3px) scale(1.01); box-shadow: 14px 14px 28px rgba(192,109,113,0.34), -8px -8px 18px rgba(255,255,255,0.42), inset 0 1px 0 rgba(255,255,255,0.18); filter: saturate(1.04); }
-  .landing-panel:focus-visible { outline: 2px solid rgba(255,255,255,0.9); outline-offset: 3px; box-shadow: 0 0 0 4px rgba(255,255,255,0.25), 14px 14px 28px rgba(192,109,113,0.34), -8px -8px 18px rgba(255,255,255,0.42); }
-  .landing-panel:active { transform: translateY(4px) scale(0.98); }
-  .landing-panel.candles:active { box-shadow: 4px 4px 10px rgba(192,109,113,0.28), -3px -3px 8px rgba(255,255,255,0.18), inset 3px 3px 8px rgba(150,76,82,0.28); }
-  .landing-panel.coffee:active { box-shadow: 4px 4px 10px rgba(180,140,140,0.5), -3px -3px 8px rgba(255,255,255,0.5), inset 3px 3px 8px rgba(156,71,34,0.35); }
+  .landing-greeting { font-family: 'Barlow Condensed', sans-serif; color: #6B4A42; text-align: left; line-height: 1.1; margin: 0; }
+  .landing-greeting.primary { font-family: 'Playfair Display', 'Cormorant Garamond', 'Georgia', serif; font-weight: 500; font-size: 1.05rem; letter-spacing: 0.12em; }
+  .landing-greeting.secondary { font-weight: 300; font-size: 1.05rem; letter-spacing: 0.06em; max-width: 520px; }
+  .landing-visual-wrap { flex: 0 0 42%; display: flex; align-items: center; justify-content: center; margin: 0; position: relative; }
+  .landing-main-image { width: min(100%, 560px); aspect-ratio: 0.9; object-fit: cover; display: block; border-radius: 32px; box-shadow: 0 26px 44px rgba(122,90,83,0.18), 0 8px 14px rgba(255,255,255,0.3); }
+  .landing-split { display: flex; width: 100%; max-width: 1280px; padding: 0 24px 0; margin: 14px auto 0; box-sizing: border-box; justify-content: flex-start; align-items: flex-start; }
+  .landing-gallery { width: min(100%, 980px); margin: 0 auto 18px; padding: 0 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .landing-gallery-card { position: relative; overflow: hidden; border-radius: 22px; background: linear-gradient(155deg, #FFFFFF, #F7E9E3); box-shadow: 10px 10px 22px rgba(180,140,140,0.18), -6px -6px 16px rgba(255,255,255,0.85); }
+  .landing-gallery-card img { display: block; width: 100%; height: 220px; object-fit: cover; }
+  .landing-cta { margin-top: 0; margin-left: 0; align-self: flex-start; }
+  .landing-cta:hover { background: rgba(255,255,255,0.5); }
+  .landing-cta:focus-visible { outline: none; box-shadow: 0 6px 14px rgba(180,140,140,0.12); }
+  .landing-cta:active { transform: none; box-shadow: 0 6px 14px rgba(180,140,140,0.12); }
   .landing-contact { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 24px 22px; }
   .contact-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
   .contact-link { display: inline-flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 400; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: #6B4A42; text-decoration: none; cursor: pointer; pointer-events: auto; position: relative; z-index: 1; transition: color 0.2s ease, text-decoration-color 0.2s ease; }
@@ -727,6 +836,42 @@ function itemTypeLabel(item) {
   return item.type === "candle" ? "Moy Candle" : "Custom Roast";
 }
 
+// Bank details shown for EFT orders (checkout + order confirmation)
+const eftDetails = (reference) => [
+  ["Bank", "Capitec Business"],
+  ["Account Name", "Moy Design"],
+  ["Account No", "1052871895"],
+  ["Branch Code", "450105"],
+  ["Reference", reference || "Your Surname"],
+];
+
+// Remembers a card order while the customer is on Yoco's payment page
+const PENDING_CARD_ORDER = "moy_pending_card_order";
+
+// ── Our Process page ────────────────────────────────────────────
+// To swap a photo: put the new file in the /public folder and change the path here.
+const PROCESS_PHOTOS = {
+  hero:  "/process-hero.jpg", // Woestyn in sunlight
+  step1: "/3.jpg",         // wax flakes
+  step2: "/2.jpeg",        // candle from above
+  step3: "/process-3.jpg", // Mymer, Gentle Reverie
+  step4: "/process-4.jpg", // lit candle at home
+};
+
+const PROCESS_STEPS = [
+  { num: "01", title: "Premium Ingredients", img: PROCESS_PHOTOS.step1, alt: "Soy-coconut wax flakes",
+    text: ["We use a natural soy-coconut wax blend, clean fragrance oils and Cherry wooden cross-wicks for a cleaner, longer and even burn for a beautiful scent experience."] },
+  { num: "02", title: "Our Signature Two-Stage Pour", img: PROCESS_PHOTOS.step2, alt: "A Moy candle seen from above",
+    text: [
+      "We pour our candles in two carefully considered stages. The first 90% uses a soy-coconut wax blend with a carefully measured fragrance load for an even distribution of fragrance throughout the candle. The final 10% is poured using 100% soy wax with a hardening additive and a higher fragrance load, helping create a refined finish and supporting a longer-lasting burn.",
+      "This considered process is designed to maximise both cold throw and hot throw, delivering a beautiful fragrance experience whether the candle is unlit or burning.",
+    ] },
+  { num: "03", title: "Cured with Care, Finished by Hand", img: PROCESS_PHOTOS.step3, alt: "Mymer Gentle Reverie candle",
+    text: ["Every Moy candle is given time to cure, allowing the fragrance to settle into the wax and develop its full scent potential. Once fully set and ready, each wick is carefully trimmed by hand, leaving every candle beautifully finished and ready to bring warmth, calm and understated luxury into your space."] },
+  { num: "04", title: "To Your Space", img: PROCESS_PHOTOS.step4, alt: "A lit Moy candle at home",
+    text: ["From our studio to your home, we take pride in creating products that not only smell incredible, but also add a sense of peace and sophistication to your everyday moments."] },
+];
+
 export default function MoyApp() {
   const [tab,       setTab]       = useState("order");
   const [step,      setStep]      = useState(0);
@@ -740,7 +885,8 @@ export default function MoyApp() {
   const [candleSel, setCandleSel] = useState({});
   const [checkout,  setCheckout]  = useState(false);
   const [done,      setDone]      = useState(false);
-  const [payMethod, setPayMethod] = useState("eft");
+  const [payMethod, setPayMethod] = useState("card");
+  const [payErr,    setPayErr]    = useState("");
   const [msgs,      setMsgs]      = useState(MSGS);
   const [liked,     setLiked]     = useState([]);
   const [newMsg,    setNewMsg]    = useState("");
@@ -765,7 +911,7 @@ export default function MoyApp() {
 
   const cartTotal = cart.reduce((s, i) => s + i.price, 0);
   const cartCount = cart.length;
-  const courierFee = cartCount >= 3 ? 0 : 75;
+  const courierFee = courierFeeFor(cartCount);
   const orderTotal = cartTotal + courierFee;
 
   const pct = Math.round(((step + 1) / steps.length) * 100);
@@ -822,7 +968,7 @@ export default function MoyApp() {
     const newItem = {
       id: Date.now(), type: "candle", candleId: c.id, brand: c.brand, tagline: c.tagline,
       size: isDiffuser ? "200ml" : selectedSize, burn: isDiffuser ? "Diffuser" : sizeInfo.burn,
-      jarColor: c.essentialOil ? sel.jarColor : null, img, price: isDiffuser ? 300 : sizeInfo.price,
+      jarColor: c.essentialOil ? sel.jarColor : null, img, price: isDiffuser ? DIFFUSER_PRICE : sizeInfo.price,
       isDiffuser,
     };
     setCart(cc => [...cc, newItem]);
@@ -843,18 +989,23 @@ export default function MoyApp() {
     setNewMsg("");
   };
 
-  const buildOrderSummary = () =>
-    cart.map(item => `- ${itemTypeLabel(item)}: ${itemName(item)} (${itemLabel(item)}) — R${item.price}`).join("<br>");
+  const buildOrderSummary = (items) =>
+    items.map(item => `- ${itemTypeLabel(item)}: ${itemName(item)} (${itemLabel(item)}) — R${item.price}`).join("<br>");
 
-  const sendOrderEmails = async () => {
+  const addressOf = (f) => `${f.street}, ${f.suburb}, ${f.city}, ${f.province}, ${f.postal}`;
+
+  // Takes the order as arguments so it also works when a customer returns from Yoco
+  const sendOrderEmails = async (items, f, method) => {
+    const fee = courierFeeFor(items.length);
+    const total = items.reduce((sum, i) => sum + i.price, 0) + fee;
     const templateParams = {
-      customer_name: `${form.firstName} ${form.lastName}`,
-      customer_email: form.email,
-      customer_phone: form.phone,
-      order_items: buildOrderSummary() + `<br>- Courier Fee: R${courierFee}${courierFee === 0 ? " (free, 3+ items)" : ""}`,
-      order_total: `R${orderTotal}`,
-      payment_method: payMethod,
-      delivery_address: `${form.street}, ${form.suburb}, ${form.city}, ${form.province}, ${form.postal}`,
+      customer_name: `${f.firstName} ${f.lastName}`,
+      customer_email: f.email,
+      customer_phone: f.phone,
+      order_items: buildOrderSummary(items) + `<br>- Courier Fee: R${fee}${fee === 0 ? " (free, 3+ items)" : ""}`,
+      order_total: `R${total}`,
+      payment_method: method === "card" ? "Card (Yoco) — paid online" : "EFT — awaiting payment",
+      delivery_address: addressOf(f),
       owner_email: EMAIL_CONFIG.ownerEmail,
     };
 
@@ -864,11 +1015,41 @@ export default function MoyApp() {
     ]);
   };
 
+  const startCardPayment = async () => {
+    const orderRef = "MOY-" + Date.now().toString(36).toUpperCase();
+    const res = await fetch("/.netlify/functions/create-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderRef,
+        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, jarColor: i.jarColor, brand: i.brand })),
+        customer: { name: `${form.firstName} ${form.lastName}`, email: form.email, phone: form.phone, address: addressOf(form) },
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.redirectUrl) throw new Error(data.error || "Card payment isn't available right now. Please try again or choose EFT.");
+    try { sessionStorage.setItem(PENDING_CARD_ORDER, JSON.stringify({ orderRef, cart, form })); } catch { /* storage blocked */ }
+    window.location.href = data.redirectUrl;
+  };
+
   const handlePlaceOrder = async () => {
     setSending(true);
     setEmailErr(false);
+    setPayErr("");
+
+    if (payMethod === "card") {
+      try {
+        await startCardPayment(); // leaves the site for Yoco's secure page
+      } catch (err) {
+        console.error("Card payment failed to start:", err);
+        setPayErr(err.message);
+        setSending(false);
+      }
+      return;
+    }
+
     try {
-      await sendOrderEmails();
+      await sendOrderEmails(cart, form, "eft");
     } catch (err) {
       console.error("Order email failed:", err);
       setEmailErr(true);
@@ -878,39 +1059,69 @@ export default function MoyApp() {
     setDone(true);
   };
 
+  // Customer has come back from Yoco's payment page
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("payment");
+    if (!status) return;
+    window.history.replaceState(null, "", window.location.pathname);
+
+    let pending = null;
+    try {
+      pending = JSON.parse(sessionStorage.getItem(PENDING_CARD_ORDER) || "null");
+      sessionStorage.removeItem(PENDING_CARD_ORDER);
+    } catch { /* storage blocked */ }
+    if (!pending) return;
+
+    setCart(pending.cart);
+    setForm(pending.form);
+    setPayMethod("card");
+    setView("candles");
+    setTab("cart");
+
+    if (status === "success") {
+      setDone(true);
+      sendOrderEmails(pending.cart, pending.form, "card").catch(err => {
+        console.error("Order email failed:", err);
+        setEmailErr(true);
+      });
+    } else {
+      setCheckout(true);
+      setPayErr(status === "cancelled"
+        ? "Payment cancelled. You haven't been charged. Try again, or choose EFT."
+        : "Your card payment didn't go through and you haven't been charged. Try again, or choose EFT.");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const resetAll = () => {
+    setPayErr("");
     setDone(false); setCheckout(false); setCart([]);
     setStep(0); setSelBean(null); setSelQty(null); setSelFmt("whole"); setSelBrew(null); setDripBoxes(null);
     setForm({ firstName:"", lastName:"", email:"", phone:"", street:"", suburb:"", city:"", province:"", postal:"", cardName:"", cardNum:"", cardExpiry:"", cardCvv:"" });
   };
 
   const Nav = () => {
-    const tabs = view === "candles"
-      ? [
-          { id:"home",  label:"Home" },
-          { id:"moy",   label:"Moy" },
-          { id:"shop",  label:"Shop" },
-          { id:"cart",  label:"Cart" },
-        ]
-      : [
-          { id:"home",      label:"Home"      },
-          { id:"moy",       label:"Moy"       },
-          { id:"roast",     label:"Our Roast" },
-          { id:"cart",      label:"Cart"      },
-          { id:"community", label:"Community" },
-        ];
     return (
-      <div className="btm-nav">
-        {tabs.map(t => (
-          <button key={t.id} className={"nav-tab" + (tab === t.id ? " active" : "")} onClick={() => {
-            if (t.id === "home") setView("landing");
-            else setTab(t.id);
-          }}>
-            <span className="nav-lbl">{t.label}</span>
-            {t.id === "cart" && cartCount > 0 && <span className="nav-badge">{cartCount}</span>}
+      <header className="top-header">
+        <div className="top-header-left">
+          <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="top-header-logo" />
+        </div>
+
+        <nav className="top-header-tabs" aria-label="Main navigation">
+          <button className="top-header-tab" type="button" onClick={() => setView("landing")}>Home</button>
+          <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("moy"); }}>Our Process</button>
+          <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("shop"); }}>Shop</button>
+        </nav>
+
+        <div className="top-header-right">
+          <button className="top-header-action" type="button" aria-label="Search">Search</button>
+          <button className="top-header-action cart" type="button" onClick={() => { setView("candles"); setTab("cart"); }} aria-label="Cart">
+            Cart
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </button>
-        ))}
-      </div>
+        </div>
+      </header>
     );
   };
 
@@ -921,19 +1132,46 @@ export default function MoyApp() {
     <>
       <style>{css}</style>
       <div className="app landing">
-        {cartCount > 0 && (
-          <button className="landing-cart-pill" onClick={() => { setView("candles"); setTab("cart"); }}>
-            {cartCount}
-          </button>
-        )}
-        <div className="landing-center">
-          <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="landing-logo" />
-          <div className="landing-greeting">Hello jou Moy ding</div>
-        </div>
-        <div className="landing-split">
-          <button className="landing-panel candles" onClick={goCandles}>
-            <span className="landing-panel-label">Fragrances</span>
-          </button>
+        <header className="top-header">
+          <div className="top-header-left">
+            <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="top-header-logo" />
+          </div>
+
+          <nav className="top-header-tabs" aria-label="Main navigation">
+            <button className="top-header-tab" type="button" onClick={() => setView("landing")}>Home</button>
+            <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("moy"); }}>Our Process</button>
+            <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("shop"); }}>Shop</button>
+          </nav>
+
+          <div className="top-header-right">
+            <button className="top-header-action" type="button" aria-label="Search">Search</button>
+            <button className="top-header-action cart" type="button" onClick={() => { setView("candles"); setTab("cart"); }} aria-label="Cart">
+              Cart
+              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+            </button>
+          </div>
+        </header>
+
+        <div className="landing-hero">
+          <div className="landing-copy" style={{ justifyContent: 'center' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', maxWidth: '520px', transform: 'translateY(-10%)', marginLeft: '0', marginRight: 'auto', gap: '0' }}>
+              <div className="landing-greeting primary" style={{ display: 'block', width: '100%', fontSize: '4rem', letterSpacing: '0.04em', color: '#1a1a1a', textTransform: 'none', textAlign: 'left', fontFamily: '"Playfair Display", serif', lineHeight: 0.9, marginLeft: '0' }}>Light</div>
+              <div className="landing-greeting primary" style={{ display: 'block', width: '100%', fontSize: '4rem', letterSpacing: '0.04em', color: '#1a1a1a', textTransform: 'none', textAlign: 'left', fontFamily: '"Playfair Display", serif', lineHeight: 0.9, marginLeft: '0' }}>Something</div>
+              <img src="/moy-wordmark-asset (2).svg" alt="Moy" style={{ display: 'block', width: '330px', height: 'auto', filter: 'none', marginLeft: '-70px', marginTop: '0', marginBottom: '0' }} />
+              <div style={{ marginTop: '14px', fontFamily: '"Helvetica Neue", Arial, sans-serif', fontSize: '0.76rem', letterSpacing: '0.12em', fontWeight: '400', textTransform: 'none', color: '#3C4241', lineHeight: '1.5', textAlign: 'left', maxWidth: '420px' }}>
+                Hand-poured, soy mix scented candles designed to bring calm to your space
+              </div>
+              <div style={{ width: '100%', marginTop: '14px', display: 'flex', justifyContent: 'flex-start' }}>
+                <button className="top-header-action landing-cta" type="button" onClick={goCandles}>
+                  Shop collection
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="landing-visual-wrap">
+            <img src="/1.jpeg" alt="Moy candle main image" className="landing-main-image" />
+          </div>
         </div>
 
         <div className="landing-contact">
@@ -958,30 +1196,40 @@ export default function MoyApp() {
 
   if (tab === "moy") return (
     <>
-      <style>{css}</style>
-      <div className="app">
-        <div className="hdr">
-          <div>
-            <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" />
-            <div className="wordmark-sub">About Moy</div>
-          </div>
-        </div>
+      <style>{css + " body { background: #FFFFFF; }"}</style>
+      <div className="app proc-app">
+        <Nav />
 
-        <div className="moy-page">
-          <div className="moy-story-card">
-            <img src="/Diffuser 2.jpg" alt="Moy diffuser" className="moy-story-image" />
-            <div className="moy-story-overlay" />
-            <div className="moy-story-content">
-              <div className="moy-story-copy">
-                <p style={{ margin: 0, marginBottom: 8, textAlign: 'left' }}>Moy is a home fragrance studio creating simple, considered candles and diffusers for everyday spaces.</p>
-                <p style={{ margin: 0, marginBottom: 8, textAlign: 'left' }}>We believe good design doesn't need to be complicated. Our products are made in small batches, with carefully chosen fragrances and natural textures.</p>
-                <p style={{ margin: 0, textAlign: 'left' }}>Moy is about creating a sense of calm through scent — understated, functional and made to be lived with.</p>
+        <section className="proc-hero">
+          <img className="proc-hero-img" src={PROCESS_PHOTOS.hero} alt="Woestyn candle in afternoon sunlight" />
+          <div className="proc-hero-fade" />
+          <div className="proc-hero-copy">
+            <div className="proc-eyebrow">Our Process</div>
+            <h1 className="proc-title">Crafted with<br /><em>Purpose</em></h1>
+            <p className="proc-intro">Every Moy candle and diffuser is the result of a thoughtful process, where quality materials, skilled hands and a love for fragrance come together.</p>
+            <div className="proc-rule" />
+          </div>
+        </section>
+
+        <section className="proc-steps">
+          {PROCESS_STEPS.map((st, i) => (
+            <div key={st.num} className={"proc-step" + (i % 2 ? " flip" : "")}>
+              <div className="proc-photo"><img src={st.img} alt={st.alt} loading="lazy" /></div>
+              <div className="proc-text">
+                <div className="proc-num"><span>{st.num}</span><i /></div>
+                <h2 className="proc-step-title">{st.title}</h2>
+                {st.text.map((t, j) => <p key={j} className="proc-body">{t}</p>)}
               </div>
             </div>
-          </div>
-        </div>
+          ))}
+        </section>
 
-        <Nav />
+        <section className="proc-band">
+          <div className="proc-band-eyebrow">More than just a candle</div>
+          <div className="proc-band-title">It's a feeling.</div>
+          <div className="proc-band-rule" />
+          <div className="proc-band-tags">Natural ingredients <b>/</b> Handcrafted <b>/</b> Luxury fragrances</div>
+        </section>
       </div>
     </>
   );
@@ -991,9 +1239,15 @@ export default function MoyApp() {
       <style>{css}</style>
       {toast && <div className="added-toast">{toast}</div>}
       <div className="app">
+        <Nav />
         <div className="success">
-          <div className="success-title">Orders placed.</div>
-          <div className="success-sub">We'll be in touch soon.</div>
+          <div className="success-title">{payMethod === "card" ? "Thank you. Payment received." : "Order placed."}</div>
+          <div className="success-sub">
+            {payMethod === "card"
+              ? "Your card payment went through. We'll be in touch soon about delivery."
+              : "Please pay by EFT using the details below. We'll send your order once payment reflects."}
+          </div>
+          {emailErr && <div className="eft-banner-text" style={{ marginBottom:16, maxWidth:320 }}>We couldn't send your confirmation email, but your order is in. WhatsApp us on 066 022 2527 if you have questions.</div>}
           <div style={{ width:"100%", maxWidth:320 }}>
             {cart.map(item => {
               return (
@@ -1015,13 +1269,19 @@ export default function MoyApp() {
               <div className="oss-price">R{courierFee}</div>
             </div>
             <div className="cart-total-bar" style={{ marginTop:12 }}>
-              <div><div className="cart-total-lbl">Total Paid</div></div>
+              <div><div className="cart-total-lbl">{payMethod === "card" ? "Total Paid" : "Total Due"}</div></div>
               <div className="cart-total-val">R{orderTotal}</div>
             </div>
+            {payMethod === "eft" && (
+              <div className="eft-box" style={{ textAlign:"left" }}>
+                {eftDetails(form.lastName).map(([k,v]) => (
+                  <div key={k} className="eft-row"><span className="eft-key">{k}</span><span className="eft-val">{v}</span></div>
+                ))}
+              </div>
+            )}
           </div>
-          <button className="btn-cta" style={{ maxWidth:280, width:"100%", marginTop:16 }} onClick={resetAll}>New Order</button>
+          <button className="btn-cta" style={{ flex:"none", maxWidth:280, width:"100%", marginTop:16 }} onClick={resetAll}>New Order</button>
         </div>
-        <Nav />
       </div>
     </>
   );
@@ -1030,9 +1290,10 @@ export default function MoyApp() {
     <>
       <style>{css}</style>
       <div className="app">
+        <Nav />
         <div className="hdr">
           <div>
-            <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" />
+            <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
             <div className="wordmark-sub">Checkout</div>
           </div>
           <button className="btn-back" style={{ height:40, borderRadius:10, padding:"0 14px" }} onClick={() => setCheckout(false)}>Back</button>
@@ -1112,15 +1373,36 @@ export default function MoyApp() {
           </div>
 
           <div className="co-sec-title">Payment Method</div>
-          <div className="eft-box">
-            {[["Bank","Capitec Business"],["Account Name","Moy Design"],["Account No","1052871895"],["Branch Code","450105"],["Reference", form.lastName || "Your Surname"]].map(([k,v]) => (
-              <div key={k} className="eft-row"><span className="eft-key">{k}</span><span className="eft-val">{v}</span></div>
+          <div className="pay-grid">
+            {[["card","Card","Pay securely now"],["eft","EFT","Bank transfer"]].map(([id, label, sub]) => (
+              <button key={id} type="button" className={"pay-btn" + (payMethod === id ? " active" : "")} onClick={() => { setPayMethod(id); setPayErr(""); }}>
+                <span className="pay-lbl pay-main">{label}</span>
+                <span className="pay-lbl">{sub}</span>
+              </button>
             ))}
           </div>
 
-          <button className="btn-place" disabled={!formOk || sending} onClick={handlePlaceOrder}>{sending ? "Sending confirmation…" : "Confirm & Place Order"}</button>
+          {payMethod === "card" ? (
+            <div className="eft-banner">
+              <div className="eft-banner-title">Secure card payment by Yoco</div>
+              <div className="eft-banner-text">When you continue, Yoco's secure payment page opens so you can pay by card. Afterwards you'll come straight back here. Moy never sees your card details.</div>
+            </div>
+          ) : (
+            <div className="eft-box">
+              {eftDetails(form.lastName).map(([k,v]) => (
+                <div key={k} className="eft-row"><span className="eft-key">{k}</span><span className="eft-val">{v}</span></div>
+              ))}
+            </div>
+          )}
+
+          {payErr && <div className="pay-error" role="alert">{payErr}</div>}
+
+          <button className="btn-place" disabled={!formOk || sending} onClick={handlePlaceOrder}>
+            {payMethod === "card"
+              ? (sending ? "Opening secure payment…" : `Pay R${orderTotal} by card`)
+              : (sending ? "Sending confirmation…" : "Confirm & Place Order")}
+          </button>
         </div>
-        <Nav />
       </div>
     </>
   );
@@ -1130,12 +1412,13 @@ export default function MoyApp() {
       <style>{css}</style>
       {toast && <div className="added-toast">{toast}</div>}
       <div className="app">
+        <Nav />
 
         {tab === "order" && (
           <>
             <div className="hdr">
               <div>
-                <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" />
+                <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
                 <div className="wordmark-sub">Roasted for you</div>
               </div>
               <div className="avatar">ME</div>
@@ -1332,15 +1615,15 @@ export default function MoyApp() {
 
         {tab === "shop" && (
           <>
-            <div className="hdr">
-              <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" />
+            <div className="hdr" style={{ marginTop: 0 }}>
+              <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
             </div>
             <div className="sec" style={{ paddingTop: 8 }}>
               <div className="sec-title">Light something Moy</div>
               <div className="sec-sub">Luxury soy blend, hand-poured in small batches.</div>
               {[...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand)).map(c => {
                 const sel = getCandleSel(c.id);
-                const sizeInfo = sel.isDiffuser ? { price: 300, burn: "Diffuser", space: "200ml" } : c.sizes[sel.size];
+                const sizeInfo = sel.isDiffuser ? { price: DIFFUSER_PRICE, burn: "Diffuser", space: "200ml" } : c.sizes[sel.size];
                 const photo = c.essentialOil ? (c.images?.[sel.jarColor] || c.img) : c.img;
                 return (
                   <div key={c.id} className="card candle-card">
@@ -1372,7 +1655,7 @@ export default function MoyApp() {
                       ))}
                       <button className={"size-option diffuser-option" + (sel.isDiffuser ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
                         <div className="size-option-g">200ml</div>
-                        <div className="size-option-price">R300</div>
+                        <div className="size-option-price">R{DIFFUSER_PRICE}</div>
                         <div className="size-option-meta">Diffuser</div>
                       </button>
                     </div>
@@ -1395,15 +1678,14 @@ export default function MoyApp() {
                 );
               })}
             </div>
-            <Nav />
           </>
         )}
 
         {tab === "roast" && (
           <>
-            <div className="hdr">
+            <div className="hdr" style={{ marginTop: 0 }}>
               <div>
-                <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" />
+                <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
                 <div className="wordmark-sub">Our roast</div>
               </div>
               <div className="avatar">ME</div>
@@ -1432,15 +1714,14 @@ export default function MoyApp() {
                 ))}
               </div>
             </div>
-            <Nav />
           </>
         )}
 
         {tab === "cart" && (
           <>
-            <div className="cart-hdr">
+            <div className="cart-hdr" style={{ marginTop: 0 }}>
               <div>
-                <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" />
+                <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
                 <div className="wordmark-sub" style={{ marginTop:3 }}>Your cart</div>
               </div>
               <div className="avatar">ME</div>
@@ -1490,14 +1771,13 @@ export default function MoyApp() {
                 </>
               )}
             </div>
-            <Nav />
           </>
         )}
 
         {tab === "community" && (
           <>
-            <div className="chat-hdr">
-              <img src="/moy-wordmark-asset (2).svg" alt="Moy" className="wordmark" style={{ marginBottom:8 }} />
+            <div className="chat-hdr" style={{ marginTop: 0 }}>
+              <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" style={{ marginBottom:8 }} />
               <div className="chat-title">Community</div>
               <div className="chat-sub">Compare beans, flavours and brewing methods</div>
             </div>
@@ -1522,8 +1802,6 @@ export default function MoyApp() {
             </div>
           </>
         )}
-
-        <Nav />
       </div>
     </>
   );
