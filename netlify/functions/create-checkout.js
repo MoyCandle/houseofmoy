@@ -8,7 +8,7 @@
 //   YOCO_SECRET_KEY = sk_live_...   (or sk_test_... while testing)
 // Netlify → Site configuration → Environment variables.
 
-import { priceForCartItem, courierFeeFor } from "../../src/pricing.js";
+import { priceForCartItem, courierFeeFor, unitsForCartItem, BUNDLES } from "../../src/pricing.js";
 
 const YOCO_CHECKOUT_URL = "https://payments.yoco.com/api/checkouts";
 const MAX_ITEMS = 30;
@@ -44,19 +44,23 @@ export default async (req) => {
 
   // Re-price every line on the server.
   let subtotal = 0;
+  let units = 0;
   const lines = [];
   for (const raw of items) {
     const item = {
       candleId: Number(raw?.candleId),
       size: Number(raw?.size),
       isDiffuser: Boolean(raw?.isDiffuser),
+      bundle: raw?.bundle && BUNDLES[raw.bundle] ? raw.bundle : null,
     };
     const price = priceForCartItem(item);
     if (price == null) return json(400, { error: "One of the items in your cart isn't available." });
     subtotal += price;
-    lines.push(`${clean(raw?.brand, 40)} ${item.isDiffuser ? "diffuser" : item.size + "g"}${raw?.jarColor ? " " + clean(raw.jarColor, 10) : ""} R${price}`);
+    units += unitsForCartItem(item);
+    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : item.size + "g";
+    lines.push(`${clean(raw?.brand, 40)} ${what}${raw?.jarColor ? " " + clean(raw.jarColor, 10) : ""} R${price}`);
   }
-  const courier = courierFeeFor(items.length);
+  const courier = courierFeeFor(units);
   const total = subtotal + courier;
 
   const c = body?.customer || {};

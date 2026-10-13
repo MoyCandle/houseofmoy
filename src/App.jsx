@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
-import { CANDLE_PRICES, DIFFUSER_PRICE, courierFeeFor } from "./pricing.js";
+import { CANDLE_PRICES, DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem } from "./pricing.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // Fill these in from your EmailJS dashboard (emailjs.com).
@@ -644,6 +644,18 @@ const css = `
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   a.top-header-tab { text-decoration: none; display: inline-block; }
 
+  .bundle-head { margin-top: 16px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: #2B2624; }
+  .bundle-head span { color: #C35F66; letter-spacing: 0.1em; margin-left: 6px; }
+  .bundle-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+  .bundle-option { text-align: left; display: flex; flex-direction: column; gap: 3px; padding: 11px 12px; border-radius: 14px; border: 1px solid rgba(43,38,36,0.12); background: #FFFFFF; cursor: pointer; transition: all 0.2s; }
+  .bundle-option:hover { border-color: rgba(195,95,102,0.5); }
+  .bundle-option.sel { border-color: #C35F66; background: #FBF1F0; box-shadow: 0 0 0 1px #C35F66 inset; }
+  .bundle-name { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.82rem; font-weight: 500; color: #1a1a1a; }
+  .bundle-name em { font-style: normal; font-weight: 400; color: #C35F66; font-size: 0.72rem; }
+  .bundle-desc { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.72rem; color: #6A6060; line-height: 1.35; }
+  .bundle-price { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; color: #C35F66; margin-top: 2px; }
+  .bundle-price s { color: #9A9090; font-size: 0.75rem; margin-right: 4px; }
+
   /* ── Search ── */
   .search-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(26,24,23,0.35); display: flex; justify-content: center; align-items: flex-start; padding: 70px 16px 16px; }
   .search-panel { width: 100%; max-width: 560px; max-height: calc(100vh - 100px); overflow-y: auto; background: #FFFFFF; border-radius: 22px; padding: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.18); }
@@ -846,6 +858,7 @@ const css = `
 
 function itemLabel(item) {
   if (item.type === "candle") {
+    if (item.bundle) return `${BUNDLES[item.bundle].name} · ${BUNDLES[item.bundle].desc}${BUNDLES[item.bundle].giftBox ? " · gift box" : ""}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
     if (item.isDiffuser) return `200ml · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
     return `${item.size}g · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
   }
@@ -1041,7 +1054,8 @@ export default function MoyApp() {
 
   const cartTotal = cart.reduce((s, i) => s + i.price, 0);
   const cartCount = cart.length;
-  const courierFee = courierFeeFor(cartCount);
+  const cartUnits = cart.reduce((n, i) => n + unitsForCartItem(i), 0);
+  const courierFee = courierFeeFor(cartUnits);
   const orderTotal = cartTotal + courierFee;
 
   const pct = Math.round(((step + 1) / steps.length) * 100);
@@ -1085,12 +1099,23 @@ export default function MoyApp() {
   const removeFromCart = (id) => setCart(c => c.filter(i => i.id !== id));
 
   const getCandleSel = (id) => candleSel[id] || { size: 200, jarColor: "white", isDiffuser: false };
-  const setCandleSize = (id, size) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), size, isDiffuser: false } }));
-  const setCandleDiffuser = (id) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), size: 200, isDiffuser: true } }));
+  const setCandleSize = (id, size) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), size, isDiffuser: false, bundle: null } }));
+  const setCandleDiffuser = (id) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), size: 200, isDiffuser: true, bundle: null } }));
+  const setCandleBundle = (id, bundle) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), isDiffuser: false, bundle } }));
   const setCandleJarColor = (id, jarColor) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), jarColor } }));
 
   const addCandleToCart = (c) => {
     const sel = getCandleSel(c.id);
+    if (sel.bundle) {
+      setCart(cc => [...cc, {
+        id: Date.now(), type: "candle", candleId: c.id, brand: c.brand, tagline: c.tagline, bundle: sel.bundle,
+        jarColor: c.essentialOil ? sel.jarColor : null, img: c.giftImages?.[sel.bundle] || (c.essentialOil ? c.images[sel.jarColor] : c.img),
+        price: priceForBundle(c.id, sel.bundle),
+      }]);
+      setTab("cart"); setView("candles");
+      showToast(`${c.brand} ${BUNDLES[sel.bundle].name} added`);
+      return;
+    }
     const isDiffuser = Boolean(sel.isDiffuser);
     const selectedSize = isDiffuser ? 200 : sel.size;
     const sizeInfo = c.sizes[selectedSize] || { price: 300, burn: "Diffuser", space: "200ml" };
@@ -1126,7 +1151,7 @@ export default function MoyApp() {
 
   // Takes the order as arguments so it also works when a customer returns from Yoco
   const sendOrderEmails = async (items, f, method) => {
-    const fee = courierFeeFor(items.length);
+    const fee = courierFeeFor(items.reduce((n, i) => n + unitsForCartItem(i), 0));
     const total = items.reduce((sum, i) => sum + i.price, 0) + fee;
     const templateParams = {
       customer_name: `${f.firstName} ${f.lastName}`,
@@ -1152,7 +1177,7 @@ export default function MoyApp() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         orderRef,
-        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, jarColor: i.jarColor, brand: i.brand })),
+        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, bundle: i.bundle || null, jarColor: i.jarColor, brand: i.brand })),
         customer: { name: `${form.firstName} ${form.lastName}`, email: form.email, phone: form.phone, address: addressOf(form) },
       }),
     });
@@ -1891,8 +1916,8 @@ export default function MoyApp() {
               <div className="sec-sub">Luxury soy blend, hand-poured in small batches.</div>
               {[...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand)).map(c => {
                 const sel = getCandleSel(c.id);
-                const sizeInfo = sel.isDiffuser ? { price: DIFFUSER_PRICE, burn: "Diffuser", space: "200ml" } : c.sizes[sel.size];
-                const photo = c.essentialOil ? (c.images?.[sel.jarColor] || c.img) : c.img;
+                const sizeInfo = sel.bundle ? { price: priceForBundle(c.id, sel.bundle) } : sel.isDiffuser ? { price: DIFFUSER_PRICE, burn: "Diffuser", space: "200ml" } : c.sizes[sel.size];
+                const photo = (sel.bundle && c.giftImages?.[sel.bundle]) || (c.essentialOil ? (c.images?.[sel.jarColor] || c.img) : c.img);
                 return (
                   <div key={c.id} id={`candle-${c.id}`} className="card candle-card">
                     <img src={photo} alt={c.brand} className="candle-photo" />
@@ -1915,17 +1940,31 @@ export default function MoyApp() {
 
                     <div className="size-picker">
                       {[200, 300].map(sz => (
-                        <button key={sz} className={"size-option" + (sel.size === sz && !sel.isDiffuser ? " sel" : "")} onClick={() => setCandleSize(c.id, sz)}>
+                        <button key={sz} className={"size-option" + (sel.size === sz && !sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleSize(c.id, sz)}>
                           <div className="size-option-g">{sz}g</div>
                           <div className="size-option-price">R{c.sizes[sz].price}</div>
                           <div className="size-option-meta">{c.sizes[sz].burn} · {c.sizes[sz].space}</div>
                         </button>
                       ))}
-                      <button className={"size-option diffuser-option" + (sel.isDiffuser ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
+                      <button className={"size-option diffuser-option" + (sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
                         <div className="size-option-g">200ml</div>
                         <div className="size-option-price">R{DIFFUSER_PRICE}</div>
                         <div className="size-option-meta">Diffuser</div>
                       </button>
+                    </div>
+
+                    <div className="bundle-head">Gift sets <span>save R{BUNDLE_DISCOUNT}</span></div>
+                    <div className="bundle-picker">
+                      {Object.entries(BUNDLES).map(([bid, b]) => {
+                        const full = priceForBundle(c.id, bid) + BUNDLE_DISCOUNT;
+                        return (
+                          <button key={bid} type="button" className={"bundle-option" + (sel.bundle === bid ? " sel" : "")} onClick={() => setCandleBundle(c.id, bid)}>
+                            <span className="bundle-name">{b.name}{b.giftBox && <em> · gift boxed</em>}</span>
+                            <span className="bundle-desc">{b.desc}</span>
+                            <span className="bundle-price"><s>R{full}</s> R{priceForBundle(c.id, bid)}</span>
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {c.essentialOil && (
