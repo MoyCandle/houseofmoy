@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { CANDLE_PRICES, DIFFUSER_PRICE, courierFeeFor } from "./pricing.js";
 
@@ -641,6 +641,9 @@ const css = `
   .pay-btn.active .pay-main { color: #FFFFFF; }
   .pay-error { margin-top: 12px; background: #FBEDEC; border: 1px solid rgba(195,95,102,0.35); color: #8A4332; border-radius: 14px; padding: 12px 14px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; line-height: 1.45; }
 
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  a.top-header-tab { text-decoration: none; display: inline-block; }
+
   /* ── Search ── */
   .search-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(26,24,23,0.35); display: flex; justify-content: center; align-items: flex-start; padding: 70px 16px 16px; }
   .search-panel { width: 100%; max-width: 560px; max-height: calc(100vh - 100px); overflow-y: auto; background: #FFFFFF; border-radius: 22px; padding: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.18); }
@@ -959,6 +962,31 @@ const CareList = ({ items }) => (
   </ol>
 );
 
+// ── Pages, web addresses and Google titles ──────────────────────
+const SITE_URL = "https://houseofmoy.co.za";
+const ROUTES = {
+  "/":            { view: "landing", tab: "shop", title: "Moy Candles | Handmade Scented Soy Candles, South Africa",
+                    description: "Moy Candles: hand-poured soy-coconut scented candles and reed diffusers, made in South Africa. Shop online and pay securely by card or EFT." },
+  "/shop":        { view: "candles", tab: "shop", title: "Shop Scented Candles & Diffusers | Moy Candles",
+                    description: "Shop Moy's hand-poured scented candles and reed diffusers: Sosie, Feestelik, Roosevelt, Baka, Woestyn and Mymer. Delivered across South Africa." },
+  "/our-process": { view: "candles", tab: "moy",  title: "Our Process | How Moy Candles Are Made",
+                    description: "Soy-coconut wax, wooden cross-wicks and our signature two-stage pour. See how every Moy candle is crafted by hand in South Africa." },
+  "/candle-care": { view: "candles", tab: "care", title: "Candle Care Tips | Moy Candles",
+                    description: "How to get the best burn from your Moy candle: first burn, trimming wooden wicks, burn times, safety and diffuser care." },
+  "/cart":        { view: "candles", tab: "cart", title: "Your Cart | Moy Candles",
+                    description: "Your Moy Candles cart." },
+};
+const TAB_PATHS = { shop: "/shop", moy: "/our-process", care: "/candle-care", cart: "/cart" };
+const routeFromLocation = () => {
+  if (typeof window === "undefined") return ROUTES["/"];
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  return ROUTES[path] || ROUTES["/"];
+};
+const setMeta = (selector, attr, value) => {
+  const el = document.querySelector(selector);
+  if (el) el.setAttribute(attr, value);
+};
+
 // ── Search ──────────────────────────────────────────────────────
 const SEARCH_PAGES = [
   { label: "Our Process", sub: "How every Moy candle is made", tab: "moy",
@@ -972,14 +1000,14 @@ const searchTextForCandle = (c) =>
    c.essentialOil ? "essential oil" : "", "candle diffuser 200g 300g 200ml"].join(" ").toLowerCase();
 
 export default function MoyApp() {
-  const [tab,       setTab]       = useState("order");
+  const [tab,       setTab]       = useState(() => routeFromLocation().tab);
   const [step,      setStep]      = useState(0);
   const [selBean,   setSelBean]   = useState(null);
   const [selQty,    setSelQty]    = useState(null);
   const [selFmt,    setSelFmt]    = useState("whole");
   const [selBrew,   setSelBrew]   = useState(null);
   const [dripBoxes, setDripBoxes] = useState(null);
-  const [view,      setView]      = useState("landing");
+  const [view,      setView]      = useState(() => routeFromLocation().view);
   const [cart,      setCart]      = useState([]);
   const [candleSel, setCandleSel] = useState({});
   const [checkout,  setCheckout]  = useState(false);
@@ -1230,6 +1258,55 @@ export default function MoyApp() {
     return () => window.removeEventListener("keydown", onKey);
   }, [searchOpen]);
 
+  // Keep the web address in step with the page, so each page has its own link Google can list
+  const currentPath = view === "landing" ? "/" : (TAB_PATHS[tab] || null);
+  const fromHistory = useRef(false);
+  useEffect(() => {
+    if (!currentPath) return;
+    if (fromHistory.current) { fromHistory.current = false; }
+    else if (window.location.pathname !== currentPath) { window.history.pushState(null, "", currentPath); window.scrollTo(0, 0); }
+    const r = ROUTES[currentPath];
+    document.title = r.title;
+    setMeta('meta[name="description"]', "content", r.description);
+    setMeta('link[rel="canonical"]', "href", SITE_URL + (currentPath === "/" ? "/" : currentPath));
+    setMeta('meta[property="og:title"]', "content", r.title);
+    setMeta('meta[property="og:description"]', "content", r.description);
+    setMeta('meta[property="og:url"]', "content", SITE_URL + currentPath);
+  }, [currentPath]);
+  useEffect(() => {
+    const onPop = () => { const r = routeFromLocation(); fromHistory.current = true; setCheckout(false); setView(r.view); setTab(r.tab); };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+  const go = (path) => (e) => {
+    if (e) e.preventDefault();
+    const r = ROUTES[path]; setCheckout(false); setView(r.view); setTab(r.tab);
+  };
+
+  // Product details for Google (shown as rich results with prices)
+  const productSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: [...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand)).map((c, i) => ({
+      "@type": "ListItem", position: i + 1,
+      item: {
+        "@type": "Product",
+        name: `${c.brand} — ${c.tagline} Scented Candle`,
+        image: SITE_URL + encodeURI(c.img),
+        description: c.mood,
+        brand: { "@type": "Brand", name: "Moy Candles" },
+        url: `${SITE_URL}/shop#candle-${c.id}`,
+        offers: {
+          "@type": "AggregateOffer", priceCurrency: "ZAR",
+          lowPrice: Math.min(...Object.values(c.sizes).map(sz => sz.price)),
+          highPrice: Math.max(...Object.values(c.sizes).map(sz => sz.price)),
+          offerCount: Object.keys(c.sizes).length + 1,
+          availability: "https://schema.org/InStock",
+        },
+      },
+    })),
+  });
+
   const searchUI = searchOpen && (
     <div className="search-overlay" onClick={closeSearch}>
       <div className="search-panel" role="dialog" aria-label="Search" onClick={e => e.stopPropagation()}>
@@ -1273,15 +1350,15 @@ export default function MoyApp() {
         </div>
 
         <nav className="top-header-tabs" aria-label="Main navigation">
-          <button className="top-header-tab" type="button" onClick={() => setView("landing")}>Home</button>
-          <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("moy"); }}>Our Process</button>
-          <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("care"); }}>Candle Care</button>
-          <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("shop"); }}>Shop</button>
+          <a className="top-header-tab" href="/" onClick={go("/")}>Home</a>
+          <a className="top-header-tab" href="/our-process" onClick={go("/our-process")}>Our Process</a>
+          <a className="top-header-tab" href="/candle-care" onClick={go("/candle-care")}>Candle Care</a>
+          <a className="top-header-tab" href="/shop" onClick={go("/shop")}>Shop</a>
         </nav>
 
         <div className="top-header-right">
           <button className="top-header-action" type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>Search</button>
-          <button className="top-header-action cart" type="button" onClick={() => { setView("candles"); setTab("cart"); }} aria-label="Cart">
+          <button className="top-header-action cart" type="button" onClick={go("/cart")} aria-label="Cart">
             Cart
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </button>
@@ -1291,7 +1368,7 @@ export default function MoyApp() {
   };
 
   const goCoffee  = () => { setView("coffee");  setTab("order"); };
-  const goCandles = () => { setView("candles"); setTab("shop");  };
+  const goCandles = () => go("/shop")();
 
   if (view === "landing") return (
     <>
@@ -1304,21 +1381,22 @@ export default function MoyApp() {
           </div>
 
           <nav className="top-header-tabs" aria-label="Main navigation">
-            <button className="top-header-tab" type="button" onClick={() => setView("landing")}>Home</button>
-            <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("moy"); }}>Our Process</button>
-            <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("care"); }}>Candle Care</button>
-            <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("shop"); }}>Shop</button>
+            <a className="top-header-tab" href="/" onClick={go("/")}>Home</a>
+            <a className="top-header-tab" href="/our-process" onClick={go("/our-process")}>Our Process</a>
+            <a className="top-header-tab" href="/candle-care" onClick={go("/candle-care")}>Candle Care</a>
+            <a className="top-header-tab" href="/shop" onClick={go("/shop")}>Shop</a>
           </nav>
 
           <div className="top-header-right">
             <button className="top-header-action" type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>Search</button>
-            <button className="top-header-action cart" type="button" onClick={() => { setView("candles"); setTab("cart"); }} aria-label="Cart">
+            <button className="top-header-action cart" type="button" onClick={go("/cart")} aria-label="Cart">
               Cart
               {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </button>
           </div>
         </header>
 
+        <h1 className="sr-only">Moy Candles: handmade scented soy candles and diffusers, South Africa</h1>
         <div className="landing-hero">
           <div className="landing-copy" style={{ justifyContent: 'center' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', maxWidth: '520px', transform: 'translateY(-10%)', marginLeft: '0', marginRight: 'auto', gap: '0' }}>
@@ -1804,6 +1882,7 @@ export default function MoyApp() {
 
         {tab === "shop" && (
           <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: productSchema }} />
             <div className="hdr" style={{ marginTop: 0 }}>
               <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
             </div>

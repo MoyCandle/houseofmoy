@@ -5,3 +5,9 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Every page address (e.g. /candle-care) loads the site; real files are served first
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
