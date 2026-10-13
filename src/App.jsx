@@ -641,6 +641,25 @@ const css = `
   .pay-btn.active .pay-main { color: #FFFFFF; }
   .pay-error { margin-top: 12px; background: #FBEDEC; border: 1px solid rgba(195,95,102,0.35); color: #8A4332; border-radius: 14px; padding: 12px 14px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; line-height: 1.45; }
 
+  /* ── Search ── */
+  .search-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(26,24,23,0.35); display: flex; justify-content: center; align-items: flex-start; padding: 70px 16px 16px; }
+  .search-panel { width: 100%; max-width: 560px; max-height: calc(100vh - 100px); overflow-y: auto; background: #FFFFFF; border-radius: 22px; padding: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.18); }
+  .search-bar { display: flex; gap: 8px; align-items: center; }
+  .search-input { flex: 1; min-width: 0; border: 1px solid rgba(43,38,36,0.15); border-radius: 999px; padding: 12px 18px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 1rem; color: #1a1a1a; outline: none; }
+  .search-input:focus { border-color: #C35F66; }
+  .search-close { border: none; background: transparent; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #6B4A42; cursor: pointer; padding: 8px; }
+  .search-hint { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; color: #6A6060; padding: 18px 8px 8px; line-height: 1.5; }
+  .search-result { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; background: none; border: none; border-top: 1px solid rgba(60,66,65,0.1); padding: 12px 6px; cursor: pointer; }
+  .search-result:first-of-type { margin-top: 10px; }
+  .search-result:hover { background: #FBF5F3; }
+  .search-thumb { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #F4EDEA; }
+  .search-thumb-page { display: flex; align-items: center; justify-content: center; color: #C35F66; font-size: 1.1rem; }
+  .search-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .search-title { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.92rem; color: #1a1a1a; }
+  .search-sub { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.76rem; color: #6A6060; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-price { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.8rem; color: #C35F66; flex-shrink: 0; }
+  .candle-card { scroll-margin-top: 20px; }
+
   /* ── Candle Care ── */
   .care-app { background: #FFFFFF; }
   .care-wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 100px; }
@@ -940,6 +959,18 @@ const CareList = ({ items }) => (
   </ol>
 );
 
+// ── Search ──────────────────────────────────────────────────────
+const SEARCH_PAGES = [
+  { label: "Our Process", sub: "How every Moy candle is made", tab: "moy",
+    words: "process wax soy coconut pour poured hand made handmade ingredients cure curing wick cold throw hot throw" },
+  { label: "Candle Care", sub: "Tips for the best burn", tab: "care",
+    words: "care burn burning trim wick tunnel tunnelling safety lid jar reuse diffuser reeds tips how to" },
+];
+
+const searchTextForCandle = (c) =>
+  [c.brand, c.tagline, c.mood, c.story, c.notes.top, c.notes.middle, c.notes.base,
+   c.essentialOil ? "essential oil" : "", "candle diffuser 200g 300g 200ml"].join(" ").toLowerCase();
+
 export default function MoyApp() {
   const [tab,       setTab]       = useState("order");
   const [step,      setStep]      = useState(0);
@@ -955,6 +986,9 @@ export default function MoyApp() {
   const [done,      setDone]      = useState(false);
   const [payMethod, setPayMethod] = useState("card");
   const [payErr,    setPayErr]    = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQ,    setSearchQ]    = useState("");
+  const [scrollTo,   setScrollTo]   = useState(null);
   const [msgs,      setMsgs]      = useState(MSGS);
   const [liked,     setLiked]     = useState([]);
   const [newMsg,    setNewMsg]    = useState("");
@@ -1169,6 +1203,68 @@ export default function MoyApp() {
     setForm({ firstName:"", lastName:"", email:"", phone:"", street:"", suburb:"", city:"", province:"", postal:"", cardName:"", cardNum:"", cardExpiry:"", cardCvv:"" });
   };
 
+  const q = searchQ.trim().toLowerCase();
+  const terms = q.split(/\s+/).filter(Boolean);
+  const matches = (text) => terms.every(t => text.includes(t));
+  const candleHits = terms.length ? candles.filter(c => matches(searchTextForCandle(c))) : [];
+  const pageHits = terms.length ? SEARCH_PAGES.filter(pg => matches((pg.label + " " + pg.words).toLowerCase())) : [];
+
+  const closeSearch = () => { setSearchOpen(false); setSearchQ(""); };
+  const openCandle = (c) => { closeSearch(); setView("candles"); setTab("shop"); setScrollTo(`candle-${c.id}`); };
+  const openPage = (pg) => { closeSearch(); setView("candles"); setTab(pg.tab); window.scrollTo(0, 0); };
+
+  useEffect(() => {
+    if (!scrollTo) return;
+    const t = setTimeout(() => {
+      const el = document.getElementById(scrollTo);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setScrollTo(null);
+    }, 60);
+    return () => clearTimeout(t);
+  }, [scrollTo, tab]);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const onKey = (e) => { if (e.key === "Escape") closeSearch(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [searchOpen]);
+
+  const searchUI = searchOpen && (
+    <div className="search-overlay" onClick={closeSearch}>
+      <div className="search-panel" role="dialog" aria-label="Search" onClick={e => e.stopPropagation()}>
+        <div className="search-bar">
+          <input className="search-input" autoFocus placeholder="Search scents, notes or pages…" value={searchQ} onChange={e => setSearchQ(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") { if (candleHits[0]) openCandle(candleHits[0]); else if (pageHits[0]) openPage(pageHits[0]); } }} />
+          <button className="search-close" type="button" onClick={closeSearch}>Close</button>
+        </div>
+        {!terms.length && <div className="search-hint">Try “vanilla”, “citrus”, “Roosevelt” or “wick”.</div>}
+        {terms.length > 0 && candleHits.length === 0 && pageHits.length === 0 && (
+          <div className="search-hint">Nothing found for “{searchQ.trim()}”. Try a scent note like “amber” or “floral”.</div>
+        )}
+        {candleHits.map(c => (
+          <button key={c.id} type="button" className="search-result" onClick={() => openCandle(c)}>
+            <img src={c.img} alt="" className="search-thumb" />
+            <span className="search-text">
+              <span className="search-title">{c.brand} — {c.tagline}</span>
+              <span className="search-sub">{c.notes.top} · {c.notes.middle} · {c.notes.base}</span>
+            </span>
+            <span className="search-price">from R{Math.min(...Object.values(c.sizes).map(sz => sz.price))}</span>
+          </button>
+        ))}
+        {pageHits.map(pg => (
+          <button key={pg.tab} type="button" className="search-result" onClick={() => openPage(pg)}>
+            <span className="search-thumb search-thumb-page">→</span>
+            <span className="search-text">
+              <span className="search-title">{pg.label}</span>
+              <span className="search-sub">{pg.sub}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   const Nav = () => {
     return (
       <header className="top-header">
@@ -1184,7 +1280,7 @@ export default function MoyApp() {
         </nav>
 
         <div className="top-header-right">
-          <button className="top-header-action" type="button" aria-label="Search">Search</button>
+          <button className="top-header-action" type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>Search</button>
           <button className="top-header-action cart" type="button" onClick={() => { setView("candles"); setTab("cart"); }} aria-label="Cart">
             Cart
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -1200,6 +1296,7 @@ export default function MoyApp() {
   if (view === "landing") return (
     <>
       <style>{css}</style>
+      {searchUI}
       <div className="app landing">
         <header className="top-header">
           <div className="top-header-left">
@@ -1214,7 +1311,7 @@ export default function MoyApp() {
           </nav>
 
           <div className="top-header-right">
-            <button className="top-header-action" type="button" aria-label="Search">Search</button>
+            <button className="top-header-action" type="button" aria-label="Search" onClick={() => setSearchOpen(true)}>Search</button>
             <button className="top-header-action cart" type="button" onClick={() => { setView("candles"); setTab("cart"); }} aria-label="Cart">
               Cart
               {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -1267,6 +1364,7 @@ export default function MoyApp() {
   if (tab === "moy") return (
     <>
       <style>{css + " body { background: #FFFFFF; }"}</style>
+      {searchUI}
       <div className="app proc-app">
         <Nav />
 
@@ -1307,6 +1405,7 @@ export default function MoyApp() {
   if (tab === "care") return (
     <>
       <style>{css + " body { background: #FFFFFF; }"}</style>
+      {searchUI}
       <div className="app care-app">
         <Nav />
         <div className="care-wrap">
@@ -1324,6 +1423,7 @@ export default function MoyApp() {
   if (done) return (
     <>
       <style>{css}</style>
+      {searchUI}
       {toast && <div className="added-toast">{toast}</div>}
       <div className="app">
         <Nav />
@@ -1376,6 +1476,7 @@ export default function MoyApp() {
   if (checkout) return (
     <>
       <style>{css}</style>
+      {searchUI}
       <div className="app">
         <Nav />
         <div className="hdr">
@@ -1497,6 +1598,7 @@ export default function MoyApp() {
   return (
     <>
       <style>{css}</style>
+      {searchUI}
       {toast && <div className="added-toast">{toast}</div>}
       <div className="app">
         <Nav />
@@ -1713,7 +1815,7 @@ export default function MoyApp() {
                 const sizeInfo = sel.isDiffuser ? { price: DIFFUSER_PRICE, burn: "Diffuser", space: "200ml" } : c.sizes[sel.size];
                 const photo = c.essentialOil ? (c.images?.[sel.jarColor] || c.img) : c.img;
                 return (
-                  <div key={c.id} className="card candle-card">
+                  <div key={c.id} id={`candle-${c.id}`} className="card candle-card">
                     <img src={photo} alt={c.brand} className="candle-photo" />
                     <div className="candle-row1" style={{ marginTop: 14 }}>
                       <img src={c.logo} alt="" className="candle-logo-sm" />
