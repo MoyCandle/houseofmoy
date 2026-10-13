@@ -641,6 +641,22 @@ const css = `
   .pay-btn.active .pay-main { color: #FFFFFF; }
   .pay-error { margin-top: 12px; background: #FBEDEC; border: 1px solid rgba(195,95,102,0.35); color: #8A4332; border-radius: 14px; padding: 12px 14px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; line-height: 1.45; }
 
+  /* ── Candle Care ── */
+  .care-app { background: #FFFFFF; }
+  .care-wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 100px; }
+  .care-intro { max-width: 520px; }
+  .care-list { list-style: none; margin: 36px 0 0; padding: 0; }
+  .care-item { display: grid; grid-template-columns: 64px 1fr; gap: 8px; padding: 24px 0; border-top: 1px solid rgba(60,66,65,0.14); }
+  .care-item:last-child { border-bottom: 1px solid rgba(60,66,65,0.14); }
+  .care-item .proc-step-title { margin-bottom: 8px; }
+  .care-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.6rem; line-height: 1; color: #3C4241; }
+  .care-sub { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: #1a1a1a; margin-top: 64px; }
+  @media (max-width: 520px) {
+    .care-wrap { padding: 36px 20px 80px; }
+    .care-item { grid-template-columns: 44px 1fr; }
+    .care-num { font-size: 1.3rem; }
+  }
+
   /* ── Our Process ── */
   .proc-app { padding-bottom: 0; background: #FFFFFF; }
   .proc-hero { position: relative; min-height: 460px; display: flex; align-items: center; background-color: #FFFFFF; overflow: hidden; }
@@ -746,7 +762,7 @@ const css = `
   .top-header-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
   .top-header-logo { width: 110px; height: auto; display: block; }
   .top-header-tabs { flex: 1; display: flex; align-items: center; justify-content: center; gap: 18px; }
-  .top-header-tab { border: none; background: transparent; color: #2B2624; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 0.82rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 8px 10px; border-radius: 999px; transition: background 0.2s ease, color 0.2s ease; }
+  .top-header-tab { white-space: nowrap; border: none; background: transparent; color: #2B2624; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 0.82rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; padding: 8px 10px; border-radius: 999px; transition: background 0.2s ease, color 0.2s ease; }
   .top-header-tab:hover { background: rgba(195,95,102,0.08); color: #C35F66; }
   .top-header-action { display: inline-flex; align-items: center; justify-content: center; min-width: 86px; height: 40px; padding: 0 16px; border: 1px solid rgba(43,38,36,0.12); border-radius: 999px; background: rgba(255,255,255,0.5); color: #2B2624; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 0.82rem; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 14px rgba(180,140,140,0.12); }
   .top-header-action.cart { min-width: 94px; position: relative; }
@@ -794,6 +810,16 @@ const css = `
   .jarcolor-swatch.white { background: #FFFFFF; }
   .jarcolor-swatch.black { background: #1A1A1A; }
   .candle-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: #1a1a1a; }
+  /* Phone header: logo + search/cart on top, menu in one row underneath */
+  @media (max-width: 600px) {
+    .top-header { flex-wrap: wrap; gap: 10px; padding: 12px 16px 0; }
+    .top-header-left { order: 1; flex: 1 1 auto; }
+    .top-header-right { order: 2; flex: 0 0 auto; gap: 8px; }
+    .top-header-tabs { order: 3; flex: 1 1 100%; justify-content: space-between; gap: 2px; flex-wrap: nowrap; }
+    .top-header-tab { font-size: 0.62rem; letter-spacing: 0.08em; padding: 6px 7px; }
+    .top-header-action, .top-header-action.cart { min-width: 0; height: 34px; padding: 0 12px; font-size: 0.6rem; }
+    .top-header-logo { width: 84px; }
+  }
 `;
 
 function itemLabel(item) {
@@ -871,6 +897,48 @@ const PROCESS_STEPS = [
   { num: "04", title: "To Your Space", img: PROCESS_PHOTOS.step4, alt: "A lit Moy candle at home",
     text: ["From our studio to your home, we take pride in creating products that not only smell incredible, but also add a sense of peace and sophistication to your everyday moments."] },
 ];
+
+// ── Candle Care page ────────────────────────────────────────────
+// Edit any tip here: change the title or text between the quotes.
+const CANDLE_CARE = [
+  { title: "The first burn matters most",
+    text: "Let your candle burn until the melted wax reaches the edges of the jar, usually 2 to 3 hours. Soy wax has a memory, so a full first melt prevents tunnelling and gives you an even burn every time after." },
+  { title: "Trim your wooden wick",
+    text: "Before every burn, gently pinch or trim away the charred tip so about 3mm of wick remains. A tidy wick gives a steady flame, less soot and a cleaner scent." },
+  { title: "Burn for up to 4 hours",
+    text: "Avoid burning for more than 4 hours at a time. Let the candle cool completely before lighting it again." },
+  { title: "Enjoy the crackle",
+    text: "Our wooden cross-wicks crackle softly as they burn. If the flame looks low, extinguish it, trim the wick and relight." },
+  { title: "Put the lid back on",
+    text: "Once the wax has cooled, replace the lid to keep dust out and protect the fragrance between burns." },
+  { title: "Burn safely",
+    text: "Never leave a burning candle unattended. Place it on a heat-safe surface away from drafts, curtains, children and pets, and keep the flame clear of anything flammable." },
+  { title: "Know when to stop",
+    text: "Stop burning when about 1cm of wax remains at the bottom of the jar, so the glass doesn't overheat." },
+  { title: "Give your jar a second life",
+    text: "Place the empty jar in the freezer for a few hours, pop out the leftover wax, then wash it in warm soapy water. It's perfect for storage, plants or your next favourite thing." },
+];
+
+const DIFFUSER_CARE = [
+  { title: "Flip the reeds",
+    text: "Turn the reeds once a week to refresh the scent. Use fewer reeds for a softer fragrance, more for a stronger one." },
+  { title: "Choose the right spot",
+    text: "Keep your diffuser out of direct sunlight and away from heat, and place it where the oil can't drip onto furniture or fabrics." },
+];
+
+const CareList = ({ items }) => (
+  <ol className="care-list">
+    {items.map((c, i) => (
+      <li key={c.title} className="care-item">
+        <span className="care-num">{String(i + 1).padStart(2, "0")}</span>
+        <div>
+          <h2 className="proc-step-title">{c.title}</h2>
+          <p className="proc-body">{c.text}</p>
+        </div>
+      </li>
+    ))}
+  </ol>
+);
 
 export default function MoyApp() {
   const [tab,       setTab]       = useState("order");
@@ -1111,6 +1179,7 @@ export default function MoyApp() {
         <nav className="top-header-tabs" aria-label="Main navigation">
           <button className="top-header-tab" type="button" onClick={() => setView("landing")}>Home</button>
           <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("moy"); }}>Our Process</button>
+          <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("care"); }}>Candle Care</button>
           <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("shop"); }}>Shop</button>
         </nav>
 
@@ -1140,6 +1209,7 @@ export default function MoyApp() {
           <nav className="top-header-tabs" aria-label="Main navigation">
             <button className="top-header-tab" type="button" onClick={() => setView("landing")}>Home</button>
             <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("moy"); }}>Our Process</button>
+            <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("care"); }}>Candle Care</button>
             <button className="top-header-tab" type="button" onClick={() => { setView("candles"); setTab("shop"); }}>Shop</button>
           </nav>
 
@@ -1230,6 +1300,23 @@ export default function MoyApp() {
           <div className="proc-band-rule" />
           <div className="proc-band-tags">Natural ingredients <b>/</b> Handcrafted <b>/</b> Luxury fragrances</div>
         </section>
+      </div>
+    </>
+  );
+
+  if (tab === "care") return (
+    <>
+      <style>{css + " body { background: #FFFFFF; }"}</style>
+      <div className="app care-app">
+        <Nav />
+        <div className="care-wrap">
+          <div className="proc-eyebrow">Candle Care</div>
+          <h1 className="proc-title">Made to be<br /><em>enjoyed</em></h1>
+          <p className="proc-intro care-intro">A little care goes a long way. Follow these simple steps to get the cleanest burn and the fullest fragrance from your Moy candle.</p>
+          <CareList items={CANDLE_CARE} />
+          <div className="care-sub">Diffuser Care</div>
+          <CareList items={DIFFUSER_CARE} />
+        </div>
       </div>
     </>
   );
