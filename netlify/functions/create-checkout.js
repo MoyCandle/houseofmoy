@@ -8,7 +8,7 @@
 //   YOCO_SECRET_KEY = sk_live_...   (or sk_test_... while testing)
 // Netlify → Site configuration → Environment variables.
 
-import { priceForCartItem, courierFeeFor, unitsForCartItem, BUNDLES } from "../../src/pricing.js";
+import { priceForCartItem, courierFeeFor, unitsForCartItem, BUNDLES, sizeLabel } from "../../src/pricing.js";
 
 const YOCO_CHECKOUT_URL = "https://payments.yoco.com/api/checkouts";
 const MAX_ITEMS = 30;
@@ -57,7 +57,7 @@ export default async (req) => {
     if (price == null) return json(400, { error: "One of the items in your cart isn't available." });
     subtotal += price;
     units += unitsForCartItem(item);
-    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : item.size + "g";
+    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : sizeLabel(item.size);
     lines.push(`${clean(raw?.brand, 40)} ${what}${raw?.jarColor ? " " + clean(raw.jarColor, 10) : ""} R${price}`);
   }
   const courier = courierFeeFor(units);

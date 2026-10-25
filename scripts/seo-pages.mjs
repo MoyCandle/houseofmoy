@@ -50,7 +50,7 @@ console.log("SEO pages + sitemap written:", urls.join(", "));
 // https://houseofmoy.co.za/catalog.csv, so the Facebook Shop updates
 // itself every time the site is deployed.
 const { candles, candleOrder } = await import("../src/candles.js");
-const { DIFFUSER_PRICE, BUNDLES, priceForBundle } = await import("../src/pricing.js");
+const { DIFFUSER_PRICE, BUNDLES, priceForBundle, sizeLabel } = await import("../src/pricing.js");
 
 const csv = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
 const img = (p) => SITE + encodeURI(p);
@@ -65,9 +65,9 @@ for (const c of [...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candl
   };
   const about = [c.mood, c.story, scentLine(c), "Hand-poured in South Africa."].filter(Boolean).join(" ");
   for (const [size, s] of Object.entries(c.sizes)) {
-    rows.push({ ...base, id: `moy-${c.id}-${size}g`, title: `${c.brand} ${c.tagline} Scented Candle ${size}g`,
-      description: `${about} ${size}g candle, about ${s.burn} burn time. ${s.space}.`,
-      price: zar(s.price), image_link: img(c.img), size: `${size}g`, product_type: "Candles > Scented Candles" });
+    rows.push({ ...base, id: `moy-${c.id}-${size}g`, title: `${c.brand} ${c.tagline} Scented Candle ${sizeLabel(size)}`,
+      description: `${about} ${sizeLabel(size)} candle, about ${s.burn} burn time. ${s.space}.`,
+      price: zar(s.price), image_link: img(c.img), size: sizeLabel(size), product_type: "Candles > Scented Candles" });
   }
   rows.push({ ...base, id: `moy-${c.id}-diffuser`, title: `${c.brand} ${c.tagline} Diffuser 200ml`,
     description: `${about} 200ml diffuser in the ${c.brand} scent.`,

@@ -15,15 +15,21 @@ export const CANDLE_PRICES = {
 
 export const DIFFUSER_PRICE = 300;
 
+// ── What customers see for each candle size ──
+// The keys (200 / 300) are internal IDs used by the cart and Yoco
+// checkout — don't change them. Change the labels here instead.
+export const SIZE_LABEL = { 200: "Small 160g", 300: "Large 300g" };
+export const sizeLabel = (size) => SIZE_LABEL[size] || `${size}g`;
+
 // ── Gift sets ──
 // Each set = the items listed, minus BUNDLE_DISCOUNT.
-// e.g. Moy Trio = 200g + 300g + diffuser = R900 - R50 = R850
+// e.g. Moy Trio = small + large candle + diffuser = R900 - R50 = R850
 export const BUNDLE_DISCOUNT = 50;
 export const BUNDLES = {
-  trio:         { name: "The Moy Trio",         parts: [200, 300, "diffuser"], giftBox: true,  desc: "200g + 300g candle + 200ml diffuser" },
-  "300-diff":   { name: "Candle & Diffuser",    parts: [300, "diffuser"],      giftBox: false, desc: "300g candle + 200ml diffuser" },
-  "200-diff":   { name: "Petite & Diffuser",    parts: [200, "diffuser"],      giftBox: false, desc: "200g candle + 200ml diffuser" },
-  "200-300":    { name: "Candle Duo",           parts: [200, 300],             giftBox: false, desc: "200g + 300g candle" },
+  trio:         { name: "The Moy Trio",         parts: [200, 300, "diffuser"], giftBox: true,  desc: "Small 160g + Large 300g candle + 200ml diffuser" },
+  "300-diff":   { name: "Candle & Diffuser",    parts: [300, "diffuser"],      giftBox: false, desc: "Large 300g candle + 200ml diffuser" },
+  "200-diff":   { name: "Petite & Diffuser",    parts: [200, "diffuser"],      giftBox: false, desc: "Small 160g candle + 200ml diffuser" },
+  "200-300":    { name: "Candle Duo",           parts: [200, 300],             giftBox: false, desc: "Small 160g + Large 300g candle" },
 };
 
 export const COURIER_FEE = 75;

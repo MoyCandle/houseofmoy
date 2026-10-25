@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { publicCandleImages, candleOrder, candles } from "./candles.js";
-import { DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem } from "./pricing.js";
+import { DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel } from "./pricing.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // Fill these in from your EmailJS dashboard (emailjs.com).
@@ -796,7 +796,7 @@ function itemLabel(item) {
   if (item.type === "candle") {
     if (item.bundle) return `${BUNDLES[item.bundle].name} · ${BUNDLES[item.bundle].desc}${BUNDLES[item.bundle].giftBox ? " · gift box" : ""}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
     if (item.isDiffuser) return `200ml · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
-    return `${item.size}g · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
+    return `${sizeLabel(item.size)} · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
   }
   if (item.isDrip) return `Drip Sachets · ${item.dripBoxes} box${item.dripBoxes > 1 ? "es" : ""} (${item.dripBoxes * 10} sachets)`;
   const brew = item.brewId ? brews.find(b => b.id === item.brewId) : null;
@@ -946,7 +946,7 @@ const SEARCH_PAGES = [
 
 const searchTextForCandle = (c) =>
   [c.brand, c.tagline, c.mood, c.story, c.notes.top, c.notes.middle, c.notes.base,
-   c.essentialOil ? "essential oil" : "", "candle diffuser 200g 300g 200ml"].join(" ").toLowerCase();
+   c.essentialOil ? "essential oil" : "", "candle diffuser small large 160g 300g 200ml"].join(" ").toLowerCase();
 
 export default function MoyApp() {
   const [tab,       setTab]       = useState(() => routeFromLocation().tab);
@@ -1877,7 +1877,7 @@ export default function MoyApp() {
                     <div className="size-picker">
                       {[200, 300].map(sz => (
                         <button key={sz} className={"size-option" + (sel.size === sz && !sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleSize(c.id, sz)}>
-                          <div className="size-option-g">{sz}g</div>
+                          <div className="size-option-g">{sizeLabel(sz)}</div>
                           <div className="size-option-price">R{c.sizes[sz].price}</div>
                           <div className="size-option-meta">{c.sizes[sz].burn} · {c.sizes[sz].space}</div>
                         </button>
