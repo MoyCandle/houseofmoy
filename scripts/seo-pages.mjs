@@ -50,7 +50,7 @@ console.log("SEO pages + sitemap written:", urls.join(", "));
 // https://houseofmoy.co.za/catalog.csv, so the Facebook Shop updates
 // itself every time the site is deployed.
 const { candles, candleOrder } = await import("../src/candles.js");
-const { DIFFUSER_PRICE, BUNDLES, priceForBundle, sizeLabel } = await import("../src/pricing.js");
+const { DIFFUSER_PRICE, BUNDLES, priceForBundle, sizeLabel, isSoldOut } = await import("../src/pricing.js");
 
 const csv = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
 const img = (p) => SITE + encodeURI(p);
@@ -61,7 +61,7 @@ const rows = [];
 for (const c of [...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand))) {
   const base = {
     link: `${SITE}/shop#candle-${c.id}`, brand: "Moy Candles", condition: "new",
-    availability: "in stock", item_group_id: `moy-${c.id}`, scent: c.brand,
+    availability: isSoldOut(c.id) ? "out of stock" : "in stock", item_group_id: `moy-${c.id}`, scent: c.brand,
   };
   const about = [c.mood, c.story, scentLine(c), "Hand-poured in South Africa."].filter(Boolean).join(" ");
   for (const [size, s] of Object.entries(c.sizes)) {

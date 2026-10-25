@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { publicCandleImages, candleOrder, candles } from "./candles.js";
-import { DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel } from "./pricing.js";
+import { DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // Fill these in from your EmailJS dashboard (emailjs.com).
@@ -1041,6 +1041,7 @@ export default function MoyApp() {
   const setCandleJarColor = (id, jarColor) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), jarColor } }));
 
   const addCandleToCart = (c) => {
+    if (isSoldOut(c.id)) return;
     const sel = getCandleSel(c.id);
     if (sel.bundle) {
       setCart(cc => [...cc, {
@@ -1915,7 +1916,9 @@ export default function MoyApp() {
 
                     <div className="candle-footer">
                       <div className="candle-total">R{sizeInfo.price}</div>
-                      <button className="candle-add-btn" onClick={() => addCandleToCart(c)}>Add to Cart</button>
+                      {isSoldOut(c.id)
+                        ? <button className="candle-add-btn" disabled style={{ opacity: 0.45, cursor: "not-allowed" }}>Sold Out</button>
+                        : <button className="candle-add-btn" onClick={() => addCandleToCart(c)}>Add to Cart</button>}
                     </div>
                   </div>
                 );

@@ -15,6 +15,12 @@ export const CANDLE_PRICES = {
 
 export const DIFFUSER_PRICE = 300;
 
+// ── Sold out ──
+// Candle IDs listed here can't be ordered (site, checkout and the
+// Facebook catalogue all follow this). Remove the ID when it's back.
+export const SOLD_OUT = [4]; // Roosevelt — new batch being made
+export const isSoldOut = (candleId) => SOLD_OUT.includes(Number(candleId));
+
 // ── What customers see for each candle size ──
 // The keys (200 / 300) are internal IDs used by the cart and Yoco
 // checkout — don't change them. Change the labels here instead.
@@ -51,6 +57,7 @@ export const unitsForCartItem = (item) => (item.bundle && BUNDLES[item.bundle] ?
 
 // Price of one cart line, or null if it isn't a real product/size.
 export const priceForCartItem = ({ candleId, size, isDiffuser, bundle }) => {
+  if (isSoldOut(candleId)) return null;
   if (bundle) return priceForBundle(candleId, bundle);
   const sizes = CANDLE_PRICES[candleId];
   if (!sizes) return null;
