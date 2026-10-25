@@ -10,7 +10,7 @@ export const publicCandleImages = {
   Feestelik: "/Feestelik.jpeg",
   Sosie: "/Sosie.jpeg",
   Baka: "/Baka.png",
-  Roosevelt: { white: "/Roosevelt White.jpeg", black: "/Roosevelt Black.jpeg" },
+  Roosevelt: { white: "/Roosevelt White.jpeg" },
 };
 
 export const candleOrder = ["Sosie", "Feestelik", "Roosevelt", "Baka", "Woestyn", "Mymer"];
@@ -44,7 +44,7 @@ export const candles = [
     id: 4, brand: "Roosevelt", tagline: "Poised Elegance",
     logo: publicCandleImages.Roosevelt.white,
     img: publicCandleImages.Roosevelt.white,
-    images: { white: publicCandleImages.Roosevelt.white, black: publicCandleImages.Roosevelt.black },
+    images: { white: publicCandleImages.Roosevelt.white },
     essentialOil: true,
     mood: "Romantic solace — a rather serene and comforting one.",
     notes: { top: "Invigorating citrus", middle: "Floral romance", base: "Warm woody depth" },

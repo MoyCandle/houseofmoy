@@ -1034,7 +1034,7 @@ export default function MoyApp() {
 
   const removeFromCart = (id) => setCart(c => c.filter(i => i.id !== id));
 
-  const getCandleSel = (id) => candleSel[id] || { size: 200, jarColor: "white", isDiffuser: false };
+  const getCandleSel = (id) => ({ size: 200, isDiffuser: false, ...candleSel[id], jarColor: "white" }); // Roosevelt comes in a white jar only
   const setCandleSize = (id, size) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), size, isDiffuser: false, bundle: null } }));
   const setCandleDiffuser = (id) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), size: 200, isDiffuser: true, bundle: null } }));
   const setCandleBundle = (id, bundle) => setCandleSel(prev => ({ ...prev, [id]: { ...getCandleSel(id), isDiffuser: false, bundle } }));
@@ -1904,15 +1904,6 @@ export default function MoyApp() {
                       })}
                     </div>
 
-                    {c.essentialOil && (
-                      <div className="jarcolor-picker">
-                        {["white", "black"].map(col => (
-                          <button key={col} className={"jarcolor-option" + (sel.jarColor === col ? " sel" : "")} onClick={() => setCandleJarColor(c.id, col)}>
-                            <span className={"jarcolor-swatch " + col} /> {col === "white" ? "White jar" : "Black jar"}
-                          </button>
-                        ))}
-                      </div>
-                    )}
 
                     <div className="candle-footer">
                       <div className="candle-total">R{sizeInfo.price}</div>
