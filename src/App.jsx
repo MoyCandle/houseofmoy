@@ -1849,8 +1849,9 @@ export default function MoyApp() {
               <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
             </div>
             <div className="sec" style={{ paddingTop: 8 }}>
-              <div className="sec-title">Light something Moy</div>
-              <div className="sec-sub">Luxury soy blend, hand-poured in small batches.</div>
+              <div className="proc-eyebrow">Shop</div>
+              <h2 className="proc-title">Light something<br /><em>Moy</em></h2>
+              <p className="proc-intro" style={{ marginBottom: 24 }}>Luxury soy blend, hand-poured in small batches.</p>
               {[...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand)).map(c => {
                 const sel = getCandleSel(c.id);
                 const sizeInfo = sel.bundle ? { price: priceForBundle(c.id, sel.bundle) } : sel.isDiffuser ? { price: DIFFUSER_PRICE, burn: "Diffuser", space: "200ml" } : c.sizes[sel.size];
