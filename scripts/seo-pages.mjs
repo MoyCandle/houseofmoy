@@ -43,3 +43,40 @@ ${urls.map(u => `  <url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`
 </urlset>
 `);
 console.log("SEO pages + sitemap written:", urls.join(", "));
+
+// ── Facebook / Instagram Shop catalogue feed ─────────────────────
+// Writes dist/catalog.csv from the same candle data and prices the
+// shop page uses. Meta Commerce Manager fetches it daily from
+// https://houseofmoy.co.za/catalog.csv, so the Facebook Shop updates
+// itself every time the site is deployed.
+const { candles, candleOrder } = await import("../src/candles.js");
+const { DIFFUSER_PRICE, BUNDLES, priceForBundle } = await import("../src/pricing.js");
+
+const csv = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+const img = (p) => SITE + encodeURI(p);
+const zar = (n) => `${Number(n).toFixed(2)} ZAR`;
+const scentLine = (c) => `Top: ${c.notes.top}. Middle: ${c.notes.middle}. Base: ${c.notes.base}.`;
+
+const rows = [];
+for (const c of [...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand))) {
+  const base = {
+    link: `${SITE}/shop#candle-${c.id}`, brand: "Moy Candles", condition: "new",
+    availability: "in stock", item_group_id: `moy-${c.id}`, scent: c.brand,
+  };
+  const about = [c.mood, c.story, scentLine(c), "Hand-poured in South Africa."].filter(Boolean).join(" ");
+  for (const [size, s] of Object.entries(c.sizes)) {
+    rows.push({ ...base, id: `moy-${c.id}-${size}g`, title: `${c.brand} ${c.tagline} Scented Candle ${size}g`,
+      description: `${about} ${size}g candle, about ${s.burn} burn time. ${s.space}.`,
+      price: zar(s.price), image_link: img(c.img), size: `${size}g`, product_type: "Candles > Scented Candles" });
+  }
+  rows.push({ ...base, id: `moy-${c.id}-diffuser`, title: `${c.brand} ${c.tagline} Diffuser 200ml`,
+    description: `${about} 200ml diffuser in the ${c.brand} scent.`,
+    price: zar(DIFFUSER_PRICE), image_link: img("/Diffuser.jpg"), size: "200ml", product_type: "Home Fragrance > Diffusers" });
+  const trio = BUNDLES.trio;
+  rows.push({ ...base, id: `moy-${c.id}-trio`, title: `${trio.name} Gift Set: ${c.brand} ${c.tagline}`,
+    description: `${trio.desc} in the ${c.brand} scent, in a gift box. ${scentLine(c)} Hand-poured in South Africa.`,
+    price: zar(priceForBundle(c.id, "trio")), image_link: img(c.giftImages?.trio || c.img), size: "Gift set", product_type: "Gift Sets" });
+}
+const cols = ["id", "title", "description", "availability", "condition", "price", "link", "image_link", "brand", "item_group_id", "size", "scent", "product_type"];
+writeFileSync("dist/catalog.csv", [cols.join(","), ...rows.map(r => cols.map(k => csv(r[k])).join(","))].join("\n") + "\n");
+console.log(`Catalogue feed written: catalog.csv (${rows.length} products)`);
