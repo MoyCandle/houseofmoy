@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { publicCandleImages, candleOrder, candles } from "./candles.js";
 import { DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
+import { trackAddToCart, trackInitiateCheckout, trackPurchase } from "./pixel.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
 // Fill these in from your EmailJS dashboard (emailjs.com).
@@ -1044,11 +1045,13 @@ export default function MoyApp() {
     if (isSoldOut(c.id)) return;
     const sel = getCandleSel(c.id);
     if (sel.bundle) {
-      setCart(cc => [...cc, {
+      const bundleItem = {
         id: Date.now(), type: "candle", candleId: c.id, brand: c.brand, tagline: c.tagline, bundle: sel.bundle,
         jarColor: c.essentialOil ? sel.jarColor : null, img: c.giftImages?.[sel.bundle] || (c.essentialOil ? c.images[sel.jarColor] : c.img),
         price: priceForBundle(c.id, sel.bundle),
-      }]);
+      };
+      setCart(cc => [...cc, bundleItem]);
+      trackAddToCart(bundleItem);
       setTab("cart"); setView("candles");
       showToast(`${c.brand} ${BUNDLES[sel.bundle].name} added`);
       return;
@@ -1064,6 +1067,7 @@ export default function MoyApp() {
       isDiffuser,
     };
     setCart(cc => [...cc, newItem]);
+    trackAddToCart(newItem);
     setTab("cart");
     setView("candles");
     showToast(`${c.brand} added`);
@@ -1128,6 +1132,7 @@ export default function MoyApp() {
     setSending(true);
     setEmailErr(false);
     setPayErr("");
+    trackInitiateCheckout(cart);
 
     if (payMethod === "card") {
       try {
@@ -1146,6 +1151,7 @@ export default function MoyApp() {
       console.error("Order email failed:", err);
       setEmailErr(true);
     }
+    trackPurchase(cart); // EFT order placed
     setSending(false);
     setCheckout(false);
     setDone(true);
@@ -1173,6 +1179,7 @@ export default function MoyApp() {
 
     if (status === "success") {
       setDone(true);
+      trackPurchase(pending.cart); // card paid on Yoco
       sendOrderEmails(pending.cart, pending.form, "card").catch(err => {
         console.error("Order email failed:", err);
         setEmailErr(true);
