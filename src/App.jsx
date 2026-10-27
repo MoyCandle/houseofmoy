@@ -762,6 +762,13 @@ const css = `
   .contact-row.social .contact-link { color: #C35F66; }
   .contact-dot { color: rgba(107,74,66,0.4); font-size: 0.72rem; }
   .candle-photo { width: 100%; height: auto; max-height: 420px; object-fit: contain; object-position: center; border-radius: 16px; display: block; background: #f3eee8; filter: contrast(1.08) saturate(1.18) brightness(1.02); }
+  .candle-gallery { position: relative; }
+  .candle-gallery-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-radius: 16px; }
+  .candle-gallery-track::-webkit-scrollbar { display: none; }
+  .candle-gallery-slide { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; }
+  .candle-gallery-dots { display: flex; justify-content: center; gap: 7px; margin-top: 10px; }
+  .candle-gallery-dot { width: 7px; height: 7px; padding: 0; border: none; border-radius: 50%; background: #d8cfc8; cursor: pointer; transition: background .2s, transform .2s; }
+  .candle-gallery-dot.on { background: #C35F66; transform: scale(1.25); }
   .candle-logo-sm { height: 46px; width: auto; flex-shrink: 0; object-fit: contain; }
   .candle-notes { margin: 12px 0; display: flex; flex-direction: column; gap: 6px; }
   .candle-notes-row { display: grid; grid-template-columns: 60px 1fr; align-items: start; column-gap: 10px; font-size: 0.85rem; font-weight: 300; color: #2E2A2A; line-height: 1.4; }
@@ -792,6 +799,33 @@ const css = `
     .top-header-logo { width: 84px; }
   }
 `;
+
+function CandleGallery({ photos, alt }) {
+  const [idx, setIdx] = useState(0);
+  const ref = useRef(null);
+  const onScroll = () => {
+    const el = ref.current;
+    if (el) setIdx(Math.round(el.scrollLeft / el.clientWidth));
+  };
+  const goTo = i => {
+    const el = ref.current;
+    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: "smooth" });
+  };
+  return (
+    <div className="candle-gallery">
+      <div className="candle-gallery-track" ref={ref} onScroll={onScroll}>
+        {photos.map((src, i) => (
+          <img key={src} src={src} alt={`${alt} photo ${i + 1}`} className="candle-photo candle-gallery-slide" loading={i === 0 ? "eager" : "lazy"} />
+        ))}
+      </div>
+      <div className="candle-gallery-dots">
+        {photos.map((_, i) => (
+          <button key={i} type="button" aria-label={`Show photo ${i + 1}`} className={"candle-gallery-dot" + (i === idx ? " on" : "")} onClick={() => goTo(i)} />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function itemLabel(item) {
   if (item.type === "candle") {
@@ -1865,7 +1899,9 @@ export default function MoyApp() {
                 const photo = (sel.bundle && c.giftImages?.[sel.bundle]) || (c.essentialOil ? (c.images?.[sel.jarColor] || c.img) : c.img);
                 return (
                   <div key={c.id} id={`candle-${c.id}`} className="card candle-card">
-                    <img src={photo} alt={c.brand} className="candle-photo" />
+                    {c.gallery?.length > 1 && photo === c.img
+                      ? <CandleGallery photos={c.gallery} alt={c.brand} />
+                      : <img src={photo} alt={c.brand} className="candle-photo" />}
                     <div className="candle-row1" style={{ marginTop: 14 }}>
                       <img src={c.logo} alt="" className="candle-logo-sm" />
                       <div style={{ flex:1, minWidth:0 }}>
