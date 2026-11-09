@@ -800,6 +800,13 @@ const css = `
   .jarcolor-swatch.white { background: #FFFFFF; }
   .jarcolor-swatch.black { background: #1A1A1A; }
   .candle-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: #1a1a1a; }
+  /* Medium screens: same two-row header so Search and Cart stay on screen */
+  @media (min-width: 601px) and (max-width: 900px) {
+    .top-header { flex-wrap: wrap; gap: 10px 16px; }
+    .top-header-left { order: 1; flex: 1 1 auto; }
+    .top-header-right { order: 2; flex: 0 0 auto; }
+    .top-header-tabs { order: 3; flex: 1 1 100%; justify-content: center; gap: 18px; flex-wrap: nowrap; }
+  }
   /* Phone header: logo + search/cart on top, menu in one row underneath */
   @media (max-width: 600px) {
     .top-header { flex-wrap: wrap; gap: 10px; padding: 12px 16px 0; }
