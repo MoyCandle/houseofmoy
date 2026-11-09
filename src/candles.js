@@ -63,7 +63,7 @@ export const candles = [
   {
     id: 6, brand: "Baka", tagline: "Rooted Clarity",
     logo: publicCandleImages.Baka, img: publicCandleImages.Baka,
-    gallery: [publicCandleImages.Baka, "/baka-2.jpg", "/baka-3.jpg", "/baka-4.jpg"],
+    gallery: [publicCandleImages.Baka, "/baka-2.jpg", "/baka-3.jpg", "/baka-5.jpg"],
     mood: "Be transported to a secluded Mediterranean terrace at dusk, where citrus trees perfume the air, warm stone walls hold the day's heat, and a soft breeze carries the promise of an unforgettable night.",
     notes: { top: "Lime, Basil, Mandarin, Orange zest", middle: "Black pepper, Geranium, Lilac, Thyme", base: "Moss, Patchouli, Musk, White Cedar" },
     story: null,
