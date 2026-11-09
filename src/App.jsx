@@ -587,7 +587,7 @@ const css = `
   .home-faq-item summary { cursor: pointer; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.95rem; color: #1a1a1a; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
   .home-faq-item summary::-webkit-details-marker { display: none; }
   .home-faq-item summary::after { content: "+"; color: #6A6060; }
-  .home-faq-item[open] summary::after { content: "\2013"; }
+  .home-faq-item[open] summary::after { content: "–"; }
   .home-faq-item p { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.9rem; line-height: 1.65; color: #3C4241; margin: 10px 0 0; }
   @media (max-width: 700px) { .home-about { padding: 20px 16px 4px; } .home-about-title { font-size: 1.35rem; } }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
