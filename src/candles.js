@@ -8,7 +8,7 @@ export const publicCandleImages = {
   Mymer: "/Mymer.jpeg",
   Woestyn: "/Woestyn.png",
   Feestelik: "/Feestelik.jpeg",
-  Sosie: "/Sosie.jpeg",
+  Sosie: "/sosie-2.jpg",
   Baka: "/baka-1.jpg",
   Roosevelt: { white: "/Roosevelt White.jpeg" },
 };
@@ -54,7 +54,7 @@ export const candles = [
   {
     id: 5, brand: "Sosie", tagline: "Blush Radiance",
     logo: publicCandleImages.Sosie, img: publicCandleImages.Sosie,
-    gallery: [publicCandleImages.Sosie, "/sosie-2.jpg", "/sosie-3.jpg"],
+    gallery: [publicCandleImages.Sosie, "/sosie-3.jpg", "/Sosie.jpeg"],
     mood: "\u201CRooms of spectacular opulence.\u201D Evokes feelings of joy, happiness and contentment.",
     notes: { top: "Crisp citrus, fruity", middle: "Floral, fruity", base: "Sweet, bubbly musk" },
     story: "Transport your space to a world of elegance and celebration.",
