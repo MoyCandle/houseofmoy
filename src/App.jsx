@@ -778,6 +778,11 @@ const css = `
   .candle-gallery-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; border-radius: 16px; }
   .candle-gallery-track::-webkit-scrollbar { display: none; }
   .candle-gallery-slide { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; }
+  .candle-gallery-arrow { position: absolute; top: calc(50% - 26px); width: 40px; height: 40px; border: none; border-radius: 50%; background: rgba(255,255,255,0.85); color: #2B2624; font-size: 1.6rem; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0 0 3px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2; }
+  .candle-gallery-arrow.prev { left: 10px; }
+  .candle-gallery-arrow.next { right: 10px; }
+  .candle-gallery-arrow:hover { background: #fff; }
+  .candle-gallery-count { position: absolute; top: 10px; right: 10px; background: rgba(43,38,36,0.6); color: #fff; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.7rem; letter-spacing: 0.08em; padding: 4px 9px; border-radius: 999px; z-index: 2; pointer-events: none; }
   .candle-gallery-dots { display: flex; justify-content: center; gap: 7px; margin-top: 10px; }
   .candle-gallery-dot { width: 7px; height: 7px; padding: 0; border: none; border-radius: 50%; background: #d8cfc8; cursor: pointer; transition: background .2s, transform .2s; }
   .candle-gallery-dot.on { background: #C35F66; transform: scale(1.25); }
@@ -837,6 +842,13 @@ function CandleGallery({ photos, alt }) {
           <img key={src} src={src} alt={`${alt} photo ${i + 1}`} className="candle-photo candle-gallery-slide" loading={i === 0 ? "eager" : "lazy"} />
         ))}
       </div>
+      {idx > 0 && (
+        <button type="button" className="candle-gallery-arrow prev" aria-label="Previous photo" onClick={() => goTo(idx - 1)}>‹</button>
+      )}
+      {idx < photos.length - 1 && (
+        <button type="button" className="candle-gallery-arrow next" aria-label="Next photo" onClick={() => goTo(idx + 1)}>›</button>
+      )}
+      <div className="candle-gallery-count">{idx + 1} / {photos.length}</div>
       <div className="candle-gallery-dots">
         {photos.map((_, i) => (
           <button key={i} type="button" aria-label={`Show photo ${i + 1}`} className={"candle-gallery-dot" + (i === idx ? " on" : "")} onClick={() => goTo(i)} />
