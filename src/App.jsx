@@ -578,6 +578,18 @@ const css = `
   .pay-btn.active .pay-main { color: #FFFFFF; }
   .pay-error { margin-top: 12px; background: #FBEDEC; border: 1px solid rgba(195,95,102,0.35); color: #8A4332; border-radius: 14px; padding: 12px 14px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; line-height: 1.45; }
 
+  .home-about { width: min(100%, 760px); margin: 8px auto 0; padding: 28px 24px 8px; box-sizing: border-box; }
+  .home-about-title { font-family: "Playfair Display", "Georgia", serif; font-weight: 500; font-size: 1.6rem; color: #1a1a1a; margin: 0 0 14px; letter-spacing: 0.01em; }
+  .home-about-text { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.95rem; line-height: 1.7; color: #3C4241; margin: 0 0 14px; }
+  .home-faq-title { margin-top: 28px; }
+  .home-faq { border-top: 1px solid rgba(60,66,65,0.15); }
+  .home-faq-item { border-bottom: 1px solid rgba(60,66,65,0.15); padding: 14px 0; }
+  .home-faq-item summary { cursor: pointer; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.95rem; color: #1a1a1a; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  .home-faq-item summary::-webkit-details-marker { display: none; }
+  .home-faq-item summary::after { content: "+"; color: #6A6060; }
+  .home-faq-item[open] summary::after { content: "\2013"; }
+  .home-faq-item p { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.9rem; line-height: 1.65; color: #3C4241; margin: 10px 0 0; }
+  @media (max-width: 700px) { .home-about { padding: 20px 16px 4px; } .home-about-title { font-size: 1.35rem; } }
   .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
   a.top-header-tab { text-decoration: none; display: inline-block; }
 
@@ -982,6 +994,15 @@ const SEARCH_PAGES = [
 const searchTextForCandle = (c) =>
   [c.brand, c.tagline, c.mood, c.story, c.notes.top, c.notes.middle, c.notes.base,
    c.essentialOil ? "essential oil" : "", "candle diffuser small large 160g 300g 200ml"].join(" ").toLowerCase();
+
+// Homepage FAQ. Keep in step with the FAQPage block in index.html.
+const HOME_FAQ = [
+  { q: "Do you do corporate gifts?", a: "Yes. We make custom gift sets for teams and clients, with your company's name on the card. Bulk pricing is available for bigger orders. WhatsApp us on 066 022 2527 to order." },
+  { q: "How do refills work?", a: "Each refill is a wax insert with its own wick. Clean out your old Moy jar, drop the refill in, and it's ready to light." },
+  { q: "Where are you based?", a: "We're in Randburg, Johannesburg. Delivery options are shown at checkout." },
+  { q: "How can I pay?", a: "Online by card or EFT." },
+  { q: "Which sizes do you offer?", a: "Our candles come in Large 300g and Small 160g." },
+];
 
 export default function MoyApp() {
   const [tab,       setTab]       = useState(() => routeFromLocation().tab);
@@ -1422,6 +1443,26 @@ export default function MoyApp() {
           </div>
         </div>
 
+        <section className="home-about" aria-labelledby="home-about-title">
+          <h2 id="home-about-title" className="home-about-title">Hand-poured candles from Johannesburg</h2>
+          <p className="home-about-text">
+            House of Moy makes small-batch scented candles and diffusers in Randburg, Johannesburg. Every candle is hand-poured in a soy-coconut wax blend and comes in two sizes, Large 300g and Small 160g. Our scents are named for moods and moments: Baka (Rooted Clarity), Woestyn (Wild Stillness), Sosie (Blush Radiance), Feestelik (Warm Embrace), Mymer (Gentle Reverie) and Roosevelt (Poised Elegance).
+          </p>
+          <p className="home-about-text">
+            Love your jar? Keep it. Our refills drop straight into your Moy jar, so you can change scents without buying a new candle.
+          </p>
+
+          <h2 className="home-about-title home-faq-title">Questions</h2>
+          <div className="home-faq">
+            {HOME_FAQ.map(({ q, a }) => (
+              <details key={q} className="home-faq-item">
+                <summary>{q}</summary>
+                <p>{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         <div className="landing-contact">
           <div className="contact-row">
             <a href="https://wa.me/27660222527" target="_blank" rel="noreferrer" className="contact-link">066 022 2527</a>
@@ -1429,9 +1470,9 @@ export default function MoyApp() {
             <a href="mailto:altemoy@gmail.com" className="contact-link">altemoy@gmail.com</a>
           </div>
           <div className="contact-row social">
-            <a href="https://facebook.com/Te.moy" target="_blank" rel="noreferrer" className="contact-link">Facebook</a>
+            <a href="https://facebook.com/houseofmoyza" target="_blank" rel="noreferrer" className="contact-link">Facebook</a>
             <span className="contact-dot">·</span>
-            <a href="https://instagram.com/te.moy" target="_blank" rel="noreferrer" className="contact-link">Instagram</a>
+            <a href="https://instagram.com/houseofmoyza" target="_blank" rel="noreferrer" className="contact-link">Instagram</a>
             <span className="contact-dot">·</span>
             <a href="https://tiktok.com/@houseofmoy" target="_blank" rel="noreferrer" className="contact-link">TikTok</a>
             <span className="contact-dot">·</span>
