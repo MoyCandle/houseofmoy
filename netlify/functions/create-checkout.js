@@ -58,7 +58,7 @@ export default async (req) => {
     if (price == null) return json(400, { error: "One of the items in your cart isn't available." });
     subtotal += price;
     units += unitsForCartItem(item);
-    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : item.isRefill ? `${sizeLabel(item.size)} refill` : sizeLabel(item.size);
+    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : item.isRefill ? `${sizeLabel(item.size)} refill, ${raw?.wick === "cotton" ? "cotton" : "wooden"} wick` : sizeLabel(item.size);
     lines.push(`${clean(raw?.brand, 40)} ${what}${raw?.jarColor ? " " + clean(raw.jarColor, 10) : ""} R${price}`);
   }
   const courier = courierFeeFor(units);

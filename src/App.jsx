@@ -869,7 +869,7 @@ function CandleGallery({ photos, alt }) {
 function itemLabel(item) {
   if (item.type === "candle") {
     if (item.bundle) return `${BUNDLES[item.bundle].name} · ${BUNDLES[item.bundle].desc}${BUNDLES[item.bundle].giftBox ? " · gift box" : ""}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
-    if (item.isRefill) return `${sizeLabel(item.size)} refill · no jar`;
+    if (item.isRefill) return `${sizeLabel(item.size)} refill · ${REFILL_WICKS[item.wick]?.label || "wooden wick"} · no jar`;
     if (item.isDiffuser) return `200ml · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
     return `${sizeLabel(item.size)} · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
   }
@@ -1025,6 +1025,10 @@ const searchTextForCandle = (c) =>
 
 // Homepage FAQ. Keep in step with the FAQPage block in index.html.
 const REFILL_PHOTOS = ["/refill-jar.jpg", "/refill-hand.jpg", "/refill-lit.jpg", "/refill-1.jpg", "/refill-2.jpg"];
+const REFILL_WICKS = {
+  wood:   { label: "Wooden wick", desc: "Stronger scent" },
+  cotton: { label: "Cotton wick", desc: "Slower, longer burn" },
+};
 const REFILL_STEPS = [
   "Burn your Moy candle down until about 1cm of wax is left.",
   "Pop the jar in the freezer for a few hours. The leftover wax shrinks and lifts out in one piece.",
@@ -1164,14 +1168,14 @@ export default function MoyApp() {
     showToast(`${c.brand} added`);
   };
 
-  const [refillSel, setRefillSel] = useState({ candleId: null, size: 300 });
+  const [refillSel, setRefillSel] = useState({ candleId: null, size: 300, wick: "wood" });
   const addRefillToCart = () => {
     const c = candles.find(x => x.id === refillSel.candleId);
     if (!c || isSoldOut(c.id)) return;
     const newItem = {
       id: Date.now(), type: "candle", candleId: c.id, brand: c.brand, tagline: c.tagline,
       size: refillSel.size, burn: c.sizes[refillSel.size].burn, jarColor: null,
-      img: REFILL_PHOTOS[0], price: REFILL_PRICES[refillSel.size], isRefill: true,
+      img: REFILL_PHOTOS[0], price: REFILL_PRICES[refillSel.size], isRefill: true, wick: refillSel.wick,
     };
     setCart(cc => [...cc, newItem]);
     trackAddToCart(newItem);
@@ -1225,7 +1229,7 @@ export default function MoyApp() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         orderRef,
-        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, isRefill: Boolean(i.isRefill), bundle: i.bundle || null, jarColor: i.jarColor, brand: i.brand })),
+        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, isRefill: Boolean(i.isRefill), wick: i.wick || null, bundle: i.bundle || null, jarColor: i.jarColor, brand: i.brand })),
         customer: { name: `${form.firstName} ${form.lastName}`, email: form.email, phone: form.phone, address: addressOf(form) },
       }),
     });
@@ -2078,6 +2082,16 @@ export default function MoyApp() {
                         <div className="size-option-g">{sizeLabel(sz)}</div>
                         <div className="size-option-price">R{REFILL_PRICES[sz]}</div>
                         <div className="size-option-meta">Fits the {sz === 300 ? "large" : "small"} Moy jar</div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="bundle-head" style={{ marginTop: 8, marginBottom: 8 }}>Choose your wick</div>
+                  <div className="size-picker">
+                    {Object.entries(REFILL_WICKS).map(([wid, w]) => (
+                      <button key={wid} className={"size-option" + (refillSel.wick === wid ? " sel" : "")} onClick={() => setRefillSel(r => ({ ...r, wick: wid }))}>
+                        <div className="size-option-g">{w.label}</div>
+                        <div className="size-option-meta">{w.desc}</div>
                       </button>
                     ))}
                   </div>
