@@ -13,6 +13,10 @@ const pages = {
     title: "Candle Care Tips | Moy Candles",
     description: "How to get the best burn from your Moy candle: first burn, trimming wooden wicks, burn times, safety and diffuser care.",
   },
+  "/refills": {
+    title: "Candle Refills | Moy Candles",
+    description: "Keep your Moy jar and change the scent. Refill inserts in every Moy scent, small and large, with a wooden or cotton wick.",
+  },
   "/shop": {
     title: "Shop Scented Candles & Diffusers | Moy Candles",
     description: "Shop Moy's hand-poured scented candles and reed diffusers: Sosie, Feestelik, Roosevelt, Baka, Woestyn and Mymer. Delivered across South Africa.",

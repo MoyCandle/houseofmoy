@@ -624,6 +624,8 @@ const css = `
   .search-price { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.8rem; color: #C35F66; flex-shrink: 0; }
   .candle-card { scroll-margin-top: 20px; }
   .refill-section { margin-top: 44px; scroll-margin-top: 20px; }
+  .refill-teaser { margin: 10px 0 30px; text-align: center; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.85rem; color: #4A4242; }
+  .refill-teaser a { color: #C35F66; text-decoration: none; font-weight: 500; }
   .refill-scents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 8px 0 16px; }
   .refill-scent { text-align: left; display: flex; flex-direction: column; gap: 3px; padding: 10px 11px; border-radius: 14px; border: 1px solid rgba(43,38,36,0.12); background: #FFFFFF; cursor: pointer; transition: all 0.2s; }
   .refill-scent:hover:not(:disabled) { border-color: rgba(195,95,102,0.5); }
@@ -826,7 +828,7 @@ const css = `
     .top-header-left { order: 1; flex: 1 1 auto; }
     .top-header-right { order: 2; flex: 0 0 auto; gap: 8px; }
     .top-header-tabs { order: 3; flex: 1 1 100%; justify-content: space-between; gap: 2px; flex-wrap: nowrap; }
-    .top-header-tab { font-size: 0.62rem; letter-spacing: 0.08em; padding: 6px 7px; }
+    .top-header-tab { font-size: 0.62rem; letter-spacing: 0.04em; padding: 6px 4px; }
     .top-header-action, .top-header-action.cart { min-width: 0; height: 34px; padding: 0 12px; font-size: 0.6rem; }
     .top-header-logo { width: 84px; }
   }
@@ -997,10 +999,12 @@ const ROUTES = {
                     description: "Soy-coconut wax, wooden cross-wicks and our signature two-stage pour. See how every Moy candle is crafted by hand in South Africa." },
   "/candle-care": { view: "candles", tab: "care", title: "Candle Care Tips | Moy Candles",
                     description: "How to get the best burn from your Moy candle: first burn, trimming wooden wicks, burn times, safety and diffuser care." },
+  "/refills":     { view: "candles", tab: "refills", title: "Candle Refills | Moy Candles",
+                    description: "Keep your Moy jar and change the scent. Refill inserts in every Moy scent, small and large, with a wooden or cotton wick." },
   "/cart":        { view: "candles", tab: "cart", title: "Your Cart | Moy Candles",
                     description: "Your Moy Candles cart." },
 };
-const TAB_PATHS = { shop: "/shop", moy: "/our-process", care: "/candle-care", cart: "/cart" };
+const TAB_PATHS = { shop: "/shop", refills: "/refills", moy: "/our-process", care: "/candle-care", cart: "/cart" };
 const routeFromLocation = () => {
   if (typeof window === "undefined") return ROUTES["/"];
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -1013,6 +1017,8 @@ const setMeta = (selector, attr, value) => {
 
 // ── Search ──────────────────────────────────────────────────────
 const SEARCH_PAGES = [
+  { label: "Refills", sub: "Keep your jar, change the scent", tab: "refills",
+    words: "refill refills insert replacement jar reuse keep wax wick cotton wooden" },
   { label: "Our Process", sub: "How every Moy candle is made", tab: "moy",
     words: "process wax soy coconut pour poured hand made handmade ingredients cure curing wick cold throw hot throw" },
   { label: "Candle Care", sub: "Tips for the best burn", tab: "care",
@@ -1434,6 +1440,7 @@ export default function MoyApp() {
           <a className="top-header-tab" href="/our-process" onClick={go("/our-process")}>Our Process</a>
           <a className="top-header-tab" href="/candle-care" onClick={go("/candle-care")}>Candle Care</a>
           <a className="top-header-tab" href="/shop" onClick={go("/shop")}>Shop</a>
+          <a className="top-header-tab" href="/refills" onClick={go("/refills")}>Refills</a>
         </nav>
 
         <div className="top-header-right">
@@ -1465,6 +1472,7 @@ export default function MoyApp() {
             <a className="top-header-tab" href="/our-process" onClick={go("/our-process")}>Our Process</a>
             <a className="top-header-tab" href="/candle-care" onClick={go("/candle-care")}>Candle Care</a>
             <a className="top-header-tab" href="/shop" onClick={go("/shop")}>Shop</a>
+          <a className="top-header-tab" href="/refills" onClick={go("/refills")}>Refills</a>
           </nav>
 
           <div className="top-header-right">
@@ -1505,7 +1513,7 @@ export default function MoyApp() {
             House of Moy makes small-batch scented candles and diffusers in Randburg, Johannesburg. Every candle is hand-poured in a soy-coconut wax blend and comes in two sizes, Large 300g and Small 160g. Our scents are named for moods and moments: Baka (Rooted Clarity), Woestyn (Wild Stillness), Sosie (Blush Radiance), Feestelik (Warm Embrace), Mymer (Gentle Reverie) and Roosevelt (Poised Elegance).
           </p>
           <p className="home-about-text">
-            Love your jar? Keep it. Our refills drop straight into your Moy jar, so you can change scents without buying a new candle.
+            Love your jar? Keep it. Our refills drop straight into your Moy jar, so you can change scents without buying a new candle. <a href="/refills" onClick={go("/refills")} style={{ color: "#C35F66", textDecoration: "none" }}>Shop refills →</a>
           </p>
 
           <h2 className="home-about-title home-faq-title">Questions</h2>
@@ -2056,7 +2064,20 @@ export default function MoyApp() {
                 );
               })}
 
-              <div id="refills" className="refill-section">
+              <div className="refill-teaser">
+                Already have a Moy jar? <a href="/refills" onClick={go("/refills")}>Shop refills →</a>
+              </div>
+            </div>
+          </>
+        )}
+
+        {tab === "refills" && (
+          <>
+            <div className="hdr" style={{ marginTop: 0 }}>
+              <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
+            </div>
+            <div className="sec" style={{ paddingTop: 8 }}>
+              <div id="refills" className="refill-section" style={{ marginTop: 0 }}>
                 <div className="proc-eyebrow">Refills</div>
                 <h2 className="proc-title">Keep the jar,<br /><em>change the scent</em></h2>
                 <p className="proc-intro" style={{ marginBottom: 18 }}>A wax insert with its own wick, made to fit your Moy jar. No new jar, lid or label, so it costs less and wastes less.</p>
