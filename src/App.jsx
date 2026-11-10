@@ -1024,7 +1024,7 @@ const searchTextForCandle = (c) =>
    c.essentialOil ? "essential oil" : "", "candle diffuser small large 160g 300g 200ml"].join(" ").toLowerCase();
 
 // Homepage FAQ. Keep in step with the FAQPage block in index.html.
-const REFILL_PHOTOS = ["/refill-1.jpg", "/refill-2.jpg", "/refill-3.jpg", "/refill-4.jpg"];
+const REFILL_PHOTOS = ["/refill-jar.jpg", "/refill-hand.jpg", "/refill-lit.jpg", "/refill-1.jpg", "/refill-2.jpg"];
 const REFILL_STEPS = [
   "Burn your Moy candle down until about 1cm of wax is left.",
   "Pop the jar in the freezer for a few hours. The leftover wax shrinks and lifts out in one piece.",
