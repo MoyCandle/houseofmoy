@@ -51,13 +51,14 @@ export default async (req) => {
       candleId: Number(raw?.candleId),
       size: Number(raw?.size),
       isDiffuser: Boolean(raw?.isDiffuser),
+      isRefill: Boolean(raw?.isRefill),
       bundle: raw?.bundle && BUNDLES[raw.bundle] ? raw.bundle : null,
     };
     const price = priceForCartItem(item);
     if (price == null) return json(400, { error: "One of the items in your cart isn't available." });
     subtotal += price;
     units += unitsForCartItem(item);
-    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : sizeLabel(item.size);
+    const what = item.bundle ? BUNDLES[item.bundle].name : item.isDiffuser ? "diffuser" : item.isRefill ? `${sizeLabel(item.size)} refill` : sizeLabel(item.size);
     lines.push(`${clean(raw?.brand, 40)} ${what}${raw?.jarColor ? " " + clean(raw.jarColor, 10) : ""} R${price}`);
   }
   const courier = courierFeeFor(units);

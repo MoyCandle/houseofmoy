@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { publicCandleImages, candleOrder, candles } from "./candles.js";
-import { DIFFUSER_PRICE, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
+import { DIFFUSER_PRICE, REFILL_PRICES, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
 import { trackAddToCart, trackInitiateCheckout, trackPurchase } from "./pixel.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
@@ -623,6 +623,14 @@ const css = `
   .search-sub { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.76rem; color: #6A6060; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .search-price { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.8rem; color: #C35F66; flex-shrink: 0; }
   .candle-card { scroll-margin-top: 20px; }
+  .refill-section { margin-top: 44px; scroll-margin-top: 20px; }
+  .refill-scents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 8px 0 16px; }
+  .refill-scent { text-align: left; display: flex; flex-direction: column; gap: 3px; padding: 10px 11px; border-radius: 14px; border: 1px solid rgba(43,38,36,0.12); background: #FFFFFF; cursor: pointer; transition: all 0.2s; }
+  .refill-scent:hover:not(:disabled) { border-color: rgba(195,95,102,0.5); }
+  .refill-scent.sel { border-color: #C35F66; background: #FBF1F0; box-shadow: 0 0 0 1px #C35F66 inset; }
+  .refill-scent:disabled { opacity: 0.45; cursor: not-allowed; }
+  .refill-steps { margin: 8px 0 4px; padding-left: 20px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.8rem; line-height: 1.5; color: #4A4242; }
+  .refill-steps li { margin-bottom: 4px; }
 
   /* ── Candle Care ── */
   .care-app { background: #FFFFFF; }
@@ -861,6 +869,7 @@ function CandleGallery({ photos, alt }) {
 function itemLabel(item) {
   if (item.type === "candle") {
     if (item.bundle) return `${BUNDLES[item.bundle].name} · ${BUNDLES[item.bundle].desc}${BUNDLES[item.bundle].giftBox ? " · gift box" : ""}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
+    if (item.isRefill) return `${sizeLabel(item.size)} refill · no jar`;
     if (item.isDiffuser) return `200ml · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
     return `${sizeLabel(item.size)} · ${item.burn}${item.jarColor ? ` · ${item.jarColor} jar` : ""}`;
   }
@@ -1015,6 +1024,14 @@ const searchTextForCandle = (c) =>
    c.essentialOil ? "essential oil" : "", "candle diffuser small large 160g 300g 200ml"].join(" ").toLowerCase();
 
 // Homepage FAQ. Keep in step with the FAQPage block in index.html.
+const REFILL_PHOTOS = ["/refill-1.jpg", "/refill-2.jpg", "/refill-3.jpg", "/refill-4.jpg"];
+const REFILL_STEPS = [
+  "Burn your Moy candle down until about 1cm of wax is left.",
+  "Pop the jar in the freezer for a few hours. The leftover wax shrinks and lifts out in one piece.",
+  "Wash the jar in warm soapy water and dry it well.",
+  "Drop the refill in, trim the wick, and light.",
+];
+
 const HOME_FAQ = [
   { q: "Do you do corporate gifts?", a: "Yes. We make custom gift sets for teams and clients, with your company's name on the card. Bulk pricing is available for bigger orders. WhatsApp us on 066 022 2527 to order." },
   { q: "How do refills work?", a: "Each refill is a wax insert with its own wick. Clean out your old Moy jar, drop the refill in, and it's ready to light." },
@@ -1147,6 +1164,22 @@ export default function MoyApp() {
     showToast(`${c.brand} added`);
   };
 
+  const [refillSel, setRefillSel] = useState({ candleId: null, size: 300 });
+  const addRefillToCart = () => {
+    const c = candles.find(x => x.id === refillSel.candleId);
+    if (!c || isSoldOut(c.id)) return;
+    const newItem = {
+      id: Date.now(), type: "candle", candleId: c.id, brand: c.brand, tagline: c.tagline,
+      size: refillSel.size, burn: c.sizes[refillSel.size].burn, jarColor: null,
+      img: REFILL_PHOTOS[0], price: REFILL_PRICES[refillSel.size], isRefill: true,
+    };
+    setCart(cc => [...cc, newItem]);
+    trackAddToCart(newItem);
+    setTab("cart");
+    setView("candles");
+    showToast(`${c.brand} refill added`);
+  };
+
   const handleLike = (id) => {
     if (liked.includes(id)) return;
     setLiked([...liked, id]);
@@ -1192,7 +1225,7 @@ export default function MoyApp() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         orderRef,
-        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, bundle: i.bundle || null, jarColor: i.jarColor, brand: i.brand })),
+        items: cart.map(i => ({ candleId: i.candleId, size: i.size, isDiffuser: i.isDiffuser, isRefill: Boolean(i.isRefill), bundle: i.bundle || null, jarColor: i.jarColor, brand: i.brand })),
         customer: { name: `${form.firstName} ${form.lastName}`, email: form.email, phone: form.phone, address: addressOf(form) },
       }),
     });
@@ -2018,6 +2051,50 @@ export default function MoyApp() {
                   </div>
                 );
               })}
+
+              <div id="refills" className="refill-section">
+                <div className="proc-eyebrow">Refills</div>
+                <h2 className="proc-title">Keep the jar,<br /><em>change the scent</em></h2>
+                <p className="proc-intro" style={{ marginBottom: 18 }}>A wax insert with its own wick, made to fit your Moy jar. No new jar, lid or label, so it costs less and wastes less.</p>
+                <div className="card candle-card">
+                  <CandleGallery photos={REFILL_PHOTOS} alt="Moy candle refill" />
+
+                  <div className="bundle-head" style={{ marginTop: 16 }}>Choose your scent</div>
+                  <div className="refill-scents">
+                    {[...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candleOrder.indexOf(b.brand)).map(c => (
+                      <button key={c.id} type="button" disabled={isSoldOut(c.id)}
+                        className={"refill-scent" + (refillSel.candleId === c.id ? " sel" : "")}
+                        onClick={() => setRefillSel(r => ({ ...r, candleId: c.id }))}>
+                        <span className="bundle-name">{c.brand}</span>
+                        <span className="bundle-desc">{isSoldOut(c.id) ? "Sold out" : c.tagline}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="bundle-head" style={{ marginBottom: 8 }}>Choose the size of your jar</div>
+                  <div className="size-picker">
+                    {[200, 300].map(sz => (
+                      <button key={sz} className={"size-option" + (refillSel.size === sz ? " sel" : "")} onClick={() => setRefillSel(r => ({ ...r, size: sz }))}>
+                        <div className="size-option-g">{sizeLabel(sz)}</div>
+                        <div className="size-option-price">R{REFILL_PRICES[sz]}</div>
+                        <div className="size-option-meta">Fits the {sz === 300 ? "large" : "small"} Moy jar</div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="bundle-head" style={{ marginTop: 16 }}>How to refill your jar</div>
+                  <ol className="refill-steps">
+                    {REFILL_STEPS.map(step => <li key={step}>{step}</li>)}
+                  </ol>
+
+                  <div className="candle-footer">
+                    <div className="candle-total">R{REFILL_PRICES[refillSel.size]}</div>
+                    {refillSel.candleId
+                      ? <button className="candle-add-btn" onClick={addRefillToCart}>Add to Cart</button>
+                      : <button className="candle-add-btn" disabled style={{ opacity: 0.45, cursor: "not-allowed" }}>Pick a scent</button>}
+                  </div>
+                </div>
+              </div>
             </div>
           </>
         )}

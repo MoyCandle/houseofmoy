@@ -15,6 +15,11 @@ export const CANDLE_PRICES = {
 
 export const DIFFUSER_PRICE = 300;
 
+// ── Refills ──
+// A wax insert with its own wick that drops into an existing Moy jar
+// (no jar, lid or sticker). Same 200 / 300 size keys as the candles.
+export const REFILL_PRICES = { 200: 200, 300: 280 };
+
 // ── Sold out ──
 // Candle IDs listed here can't be ordered (site, checkout and the
 // Facebook catalogue all follow this). Remove the ID when it's back.
@@ -56,11 +61,12 @@ export const priceForBundle = (candleId, bundleId) => {
 export const unitsForCartItem = (item) => (item.bundle && BUNDLES[item.bundle] ? BUNDLES[item.bundle].parts.length : 1);
 
 // Price of one cart line, or null if it isn't a real product/size.
-export const priceForCartItem = ({ candleId, size, isDiffuser, bundle }) => {
+export const priceForCartItem = ({ candleId, size, isDiffuser, isRefill, bundle }) => {
   if (isSoldOut(candleId)) return null;
   if (bundle) return priceForBundle(candleId, bundle);
   const sizes = CANDLE_PRICES[candleId];
   if (!sizes) return null;
   if (isDiffuser) return DIFFUSER_PRICE;
+  if (isRefill) return REFILL_PRICES[size] ?? null;
   return sizes[size] ?? null;
 };
