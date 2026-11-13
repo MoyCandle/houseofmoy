@@ -967,6 +967,24 @@ const CANDLE_CARE = [
     text: "Place the empty jar in the freezer for a few hours, pop out the leftover wax, then wash it in warm soapy water. It's perfect for storage, plants or your next favourite thing." },
 ];
 
+// Shipping & Returns page. Google Merchant Center checks for this page.
+const SHIPPING_INFO = [
+  { title: "Made to order",
+    text: "Every Moy candle is hand-poured when you order. Please allow 2 working days for us to pour and pack your order before it ships." },
+  { title: "Delivery",
+    text: "We deliver by courier across South Africa. Delivery takes 3 to 5 working days after your order ships. The courier fee is R75, and delivery is free when you order 3 or more items." },
+];
+const RETURNS_INFO = [
+  { title: "Returns",
+    text: "You can return unused, unlit items within 7 days of delivery. The customer pays the return courier fee. Once we've received and checked your return, we'll refund you within 7 days." },
+  { title: "Burned candles",
+    text: "Candles that have been burned can't be returned, for hygiene and safety reasons." },
+  { title: "Arrived damaged?",
+    text: "If anything arrives broken, WhatsApp us a photo on 066 022 2527 within 48 hours of delivery and we'll send a replacement at no cost to you." },
+];
+// Remove after Christmas 2026.
+const CHRISTMAS_NOTE = "Ordering for Christmas? Order by Friday 12 December 2026 for delivery before Christmas.";
+
 const DIFFUSER_CARE = [
   { title: "Flip the reeds",
     text: "Turn the reeds once a week to refresh the scent. Use fewer reeds for a softer fragrance, more for a stronger one." },
@@ -1001,10 +1019,12 @@ const ROUTES = {
                     description: "How to get the best burn from your Moy candle: first burn, trimming wooden wicks, burn times, safety and diffuser care." },
   "/refills":     { view: "candles", tab: "refills", title: "Candle Refills | Moy Candles",
                     description: "Keep your Moy jar and change the scent. Refill inserts in every Moy scent, small and large, with a wooden or cotton wick." },
+  "/shipping-returns": { view: "candles", tab: "shipping", title: "Shipping & Returns | Moy Candles",
+                    description: "Moy Candles delivery and returns: hand-poured to order in 2 working days, courier across South Africa in 3 to 5 working days, R75 or free from 3 items. 7-day returns." },
   "/cart":        { view: "candles", tab: "cart", title: "Your Cart | Moy Candles",
                     description: "Your Moy Candles cart." },
 };
-const TAB_PATHS = { shop: "/shop", refills: "/refills", moy: "/our-process", care: "/candle-care", cart: "/cart" };
+const TAB_PATHS = { shop: "/shop", refills: "/refills", moy: "/our-process", care: "/candle-care", shipping: "/shipping-returns", cart: "/cart" };
 const routeFromLocation = () => {
   if (typeof window === "undefined") return ROUTES["/"];
   const path = window.location.pathname.replace(/\/+$/, "") || "/";
@@ -1017,6 +1037,8 @@ const setMeta = (selector, attr, value) => {
 
 // ── Search ──────────────────────────────────────────────────────
 const SEARCH_PAGES = [
+  { label: "Shipping & Returns", sub: "Delivery times, courier fee and returns", tab: "shipping",
+    words: "shipping delivery deliver courier fee free returns return refund exchange damaged broken christmas order by how long" },
   { label: "Refills", sub: "Keep your jar, change the scent", tab: "refills",
     words: "refill refills insert replacement jar reuse keep wax wick cotton wooden" },
   { label: "Our Process", sub: "How every Moy candle is made", tab: "moy",
@@ -1045,7 +1067,7 @@ const REFILL_STEPS = [
 const HOME_FAQ = [
   { q: "Do you do corporate gifts?", a: "Yes. We make custom gift sets for teams and clients, with your company's name on the card. Bulk pricing is available for bigger orders. WhatsApp us on 066 022 2527 to order." },
   { q: "How do refills work?", a: "Each refill is a wax insert with its own wick. Clean out your old Moy jar, drop the refill in, and it's ready to light." },
-  { q: "Where are you based?", a: "We're in Randburg, Johannesburg. Delivery options are shown at checkout." },
+  { q: "Where are you based?", a: "We're in Randburg, Johannesburg, and deliver by courier across South Africa in 3 to 5 working days. The courier fee is R75, free from 3 items." },
   { q: "How can I pay?", a: "Online by card or EFT." },
   { q: "Which sizes do you offer?", a: "Our candles come in Large 300g and Small 160g." },
 ];
@@ -1529,6 +1551,9 @@ export default function MoyApp() {
 
         <div className="landing-contact">
           <div className="contact-row">
+            <a href="/shipping-returns" onClick={go("/shipping-returns")} className="contact-link">Shipping &amp; Returns</a>
+          </div>
+          <div className="contact-row">
             <a href="https://wa.me/27660222527" target="_blank" rel="noreferrer" className="contact-link">066 022 2527</a>
             <span className="contact-dot">·</span>
             <a href="mailto:altemoy@gmail.com" className="contact-link">altemoy@gmail.com</a>
@@ -1584,6 +1609,28 @@ export default function MoyApp() {
           <div className="proc-band-rule" />
           <div className="proc-band-tags">Natural ingredients <b>/</b> Handcrafted <b>/</b> Luxury fragrances</div>
         </section>
+      </div>
+    </>
+  );
+
+  if (tab === "shipping") return (
+    <>
+      <style>{css + " body { background: #FFFFFF; }"}</style>
+      {searchUI}
+      <div className="app care-app">
+        <Nav />
+        <div className="care-wrap">
+          <div className="proc-eyebrow">Shipping &amp; Returns</div>
+          <h1 className="proc-title">From our hands<br /><em>to your home</em></h1>
+          <p className="proc-intro care-intro">{CHRISTMAS_NOTE}</p>
+          <CareList items={SHIPPING_INFO} />
+          <div className="care-sub">Returns</div>
+          <CareList items={RETURNS_INFO} />
+          <p className="proc-body" style={{ marginTop: 40 }}>
+            Questions? WhatsApp <a href="https://wa.me/27660222527" target="_blank" rel="noreferrer">066 022 2527</a> or
+            email <a href="mailto:altemoy@gmail.com">altemoy@gmail.com</a>.
+          </p>
+        </div>
       </div>
     </>
   );

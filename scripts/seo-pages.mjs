@@ -17,6 +17,10 @@ const pages = {
     title: "Candle Refills | Moy Candles",
     description: "Keep your Moy jar and change the scent. Refill inserts in every Moy scent, small and large, with a wooden or cotton wick.",
   },
+  "/shipping-returns": {
+    title: "Shipping & Returns | Moy Candles",
+    description: "Moy Candles delivery and returns: hand-poured to order in 2 working days, courier across South Africa in 3 to 5 working days, R75 or free from 3 items. 7-day returns.",
+  },
   "/shop": {
     title: "Shop Scented Candles & Diffusers | Moy Candles",
     description: "Shop Moy's hand-poured scented candles and reed diffusers: Sosie, Feestelik, Roosevelt, Baka, Woestyn and Mymer. Delivered across South Africa.",
