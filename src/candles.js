@@ -7,7 +7,7 @@ import { CANDLE_PRICES } from "./pricing.js";
 export const publicCandleImages = {
   Mymer: "/mymer-1.jpg",
   Woestyn: "/woestyn-1.jpg",
-  Feestelik: "/feestelik-1.jpg",
+  Feestelik: "/feestelik-pair.jpg",
   Sosie: "/sosie-2.jpg",
   Baka: "/baka-1.jpg",
   Roosevelt: { white: "/Roosevelt White.jpeg" },
@@ -37,6 +37,7 @@ export const candles = [
   {
     id: 3, brand: "Feestelik", tagline: "Warm Embrace",
     logo: publicCandleImages.Feestelik, img: publicCandleImages.Feestelik,
+    gallery: [publicCandleImages.Feestelik, "/feestelik-large.jpg", "/feestelik-small.jpg", "/feestelik-1.jpg"],
     mood: "A whimsical accomplice to stolen moments of indulgence.",
     notes: { top: "Juicy crisp pear", middle: "Creamy baked-good warmth", base: "Warm amber, sweet vanilla" },
     story: "Be transported to a sugar-dusted haven where even the air tastes like a hug from your grandmother's oven.",
