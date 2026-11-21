@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { publicCandleImages, candleOrder, candles } from "./candles.js";
-import { DIFFUSER_PRICE, REFILL_PRICES, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
+import { DIFFUSER_PRICE, DIFFUSERS_AVAILABLE, bundleAvailable, REFILL_PRICES, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
 import { trackAddToCart, trackInitiateCheckout, trackPurchase } from "./pixel.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
@@ -1010,9 +1010,9 @@ const CareList = ({ items }) => (
 const SITE_URL = "https://houseofmoy.co.za";
 const ROUTES = {
   "/":            { view: "landing", tab: "shop", title: "Moy Candles | Handmade Scented Soy Candles, South Africa",
-                    description: "Moy Candles: hand-poured soy-coconut scented candles and reed diffusers, made in South Africa. Shop online and pay securely by card or EFT." },
-  "/shop":        { view: "candles", tab: "shop", title: "Shop Scented Candles & Diffusers | Moy Candles",
-                    description: "Shop Moy's hand-poured scented candles and reed diffusers: Sosie, Feestelik, Roosevelt, Baka, Woestyn and Mymer. Delivered across South Africa." },
+                    description: "Moy Candles: hand-poured soy-coconut scented candles, made in South Africa. Shop online and pay securely by card or EFT." },
+  "/shop":        { view: "candles", tab: "shop", title: "Shop Scented Candles | Moy Candles",
+                    description: "Shop Moy's hand-poured scented candles: Woestyn, Sosie, Feestelik, Baka, Mymer and Roosevelt. Delivered across South Africa." },
   "/our-process": { view: "candles", tab: "moy",  title: "Our Process | How Moy Candles Are Made",
                     description: "Soy-coconut wax, wooden cross-wicks and our signature two-stage pour. See how every Moy candle is crafted by hand in South Africa." },
   "/candle-care": { view: "candles", tab: "care", title: "Candle Care Tips | Moy Candles",
@@ -2079,16 +2079,16 @@ export default function MoyApp() {
                           <div className="size-option-meta">{c.sizes[sz].burn} · {c.sizes[sz].space}</div>
                         </button>
                       ))}
-                      <button className={"size-option diffuser-option" + (sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
+                      {DIFFUSERS_AVAILABLE && <button className={"size-option diffuser-option" + (sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
                         <div className="size-option-g">200ml</div>
                         <div className="size-option-price">R{DIFFUSER_PRICE}</div>
                         <div className="size-option-meta">Diffuser</div>
-                      </button>
+                      </button>}
                     </div>
 
                     <div className="bundle-head">Gift sets <span>save R{BUNDLE_DISCOUNT}</span></div>
                     <div className="bundle-picker">
-                      {Object.entries(BUNDLES).map(([bid, b]) => {
+                      {Object.entries(BUNDLES).filter(([bid]) => bundleAvailable(bid)).map(([bid, b]) => {
                         const full = priceForBundle(c.id, bid) + BUNDLE_DISCOUNT;
                         return (
                           <button key={bid} type="button" className={"bundle-option" + (sel.bundle === bid ? " sel" : "")} onClick={() => setCandleBundle(c.id, bid)}>
