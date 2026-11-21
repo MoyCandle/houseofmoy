@@ -5,20 +5,21 @@
 import { CANDLE_PRICES } from "./pricing.js";
 
 export const publicCandleImages = {
-  Mymer: "/Mymer.jpeg",
-  Woestyn: "/Woestyn.png",
-  Feestelik: "/Feestelik.jpeg",
+  Mymer: "/mymer-1.jpg",
+  Woestyn: "/woestyn-1.jpg",
+  Feestelik: "/feestelik-1.jpg",
   Sosie: "/sosie-2.jpg",
   Baka: "/baka-1.jpg",
   Roosevelt: { white: "/Roosevelt White.jpeg" },
 };
 
-export const candleOrder = ["Sosie", "Feestelik", "Roosevelt", "Baka", "Woestyn", "Mymer"];
+export const candleOrder = ["Woestyn", "Sosie", "Feestelik", "Baka", "Mymer", "Roosevelt"];
 
 export const candles = [
   {
     id: 1, brand: "Mymer", tagline: "Gentle Reverie",
     logo: publicCandleImages.Mymer, img: publicCandleImages.Mymer,
+    gallery: [publicCandleImages.Mymer, "/mymer-2.jpg", "/mymer-3.jpg"],
     mood: "The emotion of stillness without emptiness. It's peace with depth. It's softness with strength.",
     notes: { top: "Pineapple, Melon, Bergamot", middle: "Lavender, Jasmine", base: "Amber, Cedarwood" },
     story: null,
@@ -27,6 +28,7 @@ export const candles = [
   {
     id: 2, brand: "Woestyn", tagline: "Wild Stillness",
     logo: publicCandleImages.Woestyn, img: publicCandleImages.Woestyn,
+    gallery: [publicCandleImages.Woestyn, "/woestyn-2.jpg", "/woestyn-3.jpg", "/woestyn-4.jpg", "/woestyn-5.jpg", "/woestyn-6.jpg"],
     mood: "Warm, cozy and intimate. Perfect for those stay-at-home Friday nights when all you want to do is unwind and indulge in some me-time.",
     notes: { top: "Earthy, herbaceous", middle: "Woody, floral", base: "Woody warmth that deepens as it burns" },
     story: "As the candle burns, the fragrance evolves and the notes blend together in harmony — complex and alluring, both grounding and uplifting.",
