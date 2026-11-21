@@ -1022,9 +1022,11 @@ const SHOP_CSS = `
   .shop-app .candle-name { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase; color: #1a1a1a; margin-bottom: 10px; }
   .shop-app .candle-desc, .shop-app .candle-story { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.84rem; line-height: 1.75; letter-spacing: 0.03em; color: #3C4241; font-weight: 400; }
   .shop-app .candle-story { font-style: italic; }
-  .shop-app .candle-notes { margin: 16px 0; gap: 8px; }
-  .shop-app .candle-notes-row { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.84rem; color: #3C4241; font-weight: 400; grid-template-columns: 72px 1fr; }
-  .shop-app .candle-notes-lbl { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.68rem; letter-spacing: 0.25em; color: #1a1a1a; }
+  .shop-app .candle-card, .shop-app .candle-row1, .shop-app .candle-notes, .shop-app .candle-notes-row { text-align: left; }
+  .shop-app .candle-row1 > div { text-align: left; }
+  .shop-app .candle-notes { margin: 18px 0; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .shop-app .candle-notes-row { display: block; width: 100%; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.84rem; line-height: 1.6; color: #3C4241; font-weight: 400; }
+  .shop-app .candle-notes-lbl { display: block; margin: 0 0 2px; font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.68rem; letter-spacing: 0.25em; color: #1a1a1a; }
   .shop-app .candle-eo-badge { background: none; color: #1a1a1a; border: 1px solid rgba(60,66,65,0.3); box-shadow: none; }
   .shop-app .size-option, .shop-app .bundle-option, .shop-app .refill-scent { background: #FFFFFF; border: 1px solid rgba(60,66,65,0.2); border-radius: 4px; box-shadow: none; }
   .shop-app .size-option.sel, .shop-app .bundle-option.sel, .shop-app .refill-scent.sel { border-color: #1a1a1a; background: #FFFFFF; box-shadow: 0 0 0 1px #1a1a1a inset; }
