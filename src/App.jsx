@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { publicCandleImages, candleOrder, candles } from "./candles.js";
-import { DIFFUSER_PRICE, REFILL_PRICES, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
+import { DIFFUSER_PRICE, DIFFUSERS_AVAILABLE, bundleAvailable, REFILL_PRICES, BUNDLES, BUNDLE_DISCOUNT, courierFeeFor, priceForBundle, unitsForCartItem, sizeLabel, isSoldOut } from "./pricing.js";
 import { trackAddToCart, trackInitiateCheckout, trackPurchase } from "./pixel.js";
 
 // ── EmailJS config ──────────────────────────────────────────────
@@ -1006,13 +1006,61 @@ const CareList = ({ items }) => (
   </ol>
 );
 
+// Shop, Refills and Cart in the same look as Our Process / Candle Care:
+// white page, Playfair headings, Helvetica Neue text, thin lines, no bubbles.
+const SHOP_CSS = `
+  body { background: #FFFFFF; }
+  .shop-app { background: #FFFFFF; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .shop-app .sec { max-width: 720px; margin: 0 auto; padding: 56px 24px 100px; }
+  .shop-app .card, .shop-app .candle-card { background: none; border: none; border-top: 1px solid rgba(60,66,65,0.14); border-radius: 0; box-shadow: none; padding: 32px 0; margin: 0; transform: none; }
+  .shop-app .card:hover { transform: none; box-shadow: none; }
+  .shop-app .candle-photo { filter: none; border-radius: 4px; background: #F6F5F3; max-height: 520px; }
+  .shop-app .candle-gallery-track { border-radius: 4px; }
+  .shop-app .candle-gallery-dot.on { background: #1a1a1a; }
+  .shop-app .candle-logo-sm { display: none; }
+  .shop-app .candle-row1 { margin: 22px 0 8px; }
+  .shop-app .candle-name { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase; color: #1a1a1a; margin-bottom: 10px; }
+  .shop-app .candle-desc, .shop-app .candle-story { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.84rem; line-height: 1.75; letter-spacing: 0.03em; color: #3C4241; font-weight: 400; }
+  .shop-app .candle-story { font-style: italic; }
+  .shop-app .candle-card, .shop-app .candle-row1, .shop-app .candle-notes, .shop-app .candle-notes-row { text-align: left; }
+  .shop-app .candle-row1 > div { text-align: left; }
+  .shop-app .candle-notes { margin: 18px 0; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .shop-app .candle-notes-row { display: block; width: 100%; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.84rem; line-height: 1.6; color: #3C4241; font-weight: 400; }
+  .shop-app .candle-notes-lbl { display: block; margin: 0 0 2px; font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.68rem; letter-spacing: 0.25em; color: #1a1a1a; }
+  .shop-app .candle-eo-badge { background: none; color: #1a1a1a; border: 1px solid rgba(60,66,65,0.3); box-shadow: none; }
+  .shop-app .size-option, .shop-app .bundle-option, .shop-app .refill-scent { background: #FFFFFF; border: 1px solid rgba(60,66,65,0.2); border-radius: 4px; box-shadow: none; }
+  .shop-app .size-option.sel, .shop-app .bundle-option.sel, .shop-app .refill-scent.sel { border-color: #1a1a1a; background: #FFFFFF; box-shadow: 0 0 0 1px #1a1a1a inset; }
+  .shop-app .size-option-g, .shop-app .size-option-price, .shop-app .bundle-name, .shop-app .bundle-price { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; color: #1a1a1a; }
+  .shop-app .size-option-g { font-size: 0.85rem; }
+  .shop-app .size-option-meta, .shop-app .bundle-desc { font-family: 'Helvetica Neue', Arial, sans-serif; color: #3C4241; }
+  .shop-app .bundle-name em, .shop-app .bundle-head span { color: #3C4241; }
+  .shop-app .bundle-head { color: #1a1a1a; letter-spacing: 0.3em; }
+  .shop-app .candle-footer { margin-top: 18px; }
+  .shop-app .candle-total { font-family: 'Playfair Display', serif; font-weight: 400; font-size: 1.5rem; color: #1a1a1a; }
+  .shop-app .candle-add-btn { background: #1a1a1a; border-radius: 999px; height: 44px; padding: 0 26px; font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: #FFFFFF; box-shadow: none; }
+  .shop-app .candle-add-btn:hover { background: #3C4241; }
+  .shop-app .refill-teaser, .shop-app .refill-teaser a { color: #1a1a1a; }
+  .shop-app .refill-teaser a { text-decoration: underline; text-underline-offset: 3px; font-weight: 400; }
+  .shop-app .cart-item { background: none; border: none; border-top: 1px solid rgba(60,66,65,0.14); border-radius: 0; box-shadow: none; padding: 20px 0; margin: 0; }
+  .shop-app .cart-item-flag { background: #F6F5F3; border-radius: 4px; }
+  .shop-app .cart-item-name { font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: 400; font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; }
+  .shop-app .cart-item-detail { color: #3C4241; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .shop-app .cart-item-price { font-family: 'Playfair Display', serif; font-weight: 400; color: #1a1a1a; }
+  .shop-app .cart-total-bar, .shop-app .oss { background: #F6F5F3; box-shadow: none; border-radius: 4px; }
+  .shop-app .cart-total-lbl, .shop-app .oss-lbl { color: #3C4241; }
+  .shop-app .oss-detail { color: #1a1a1a; }
+  .shop-app .cart-total-val, .shop-app .oss-price { font-family: 'Playfair Display', serif; font-weight: 400; color: #1a1a1a; text-shadow: none; }
+  .shop-app .cart-empty-title { font-family: 'Playfair Display', serif; font-weight: 400; }
+  .shop-app .cart-empty-sub { color: #3C4241; font-family: 'Helvetica Neue', Arial, sans-serif; }
+`;
+
 // ── Pages, web addresses and Google titles ──────────────────────
 const SITE_URL = "https://houseofmoy.co.za";
 const ROUTES = {
   "/":            { view: "landing", tab: "shop", title: "Moy Candles | Handmade Scented Soy Candles, South Africa",
-                    description: "Moy Candles: hand-poured soy-coconut scented candles and reed diffusers, made in South Africa. Shop online and pay securely by card or EFT." },
-  "/shop":        { view: "candles", tab: "shop", title: "Shop Scented Candles & Diffusers | Moy Candles",
-                    description: "Shop Moy's hand-poured scented candles and reed diffusers: Sosie, Feestelik, Roosevelt, Baka, Woestyn and Mymer. Delivered across South Africa." },
+                    description: "Moy Candles: hand-poured soy-coconut scented candles, made in South Africa. Shop online and pay securely by card or EFT." },
+  "/shop":        { view: "candles", tab: "shop", title: "Shop Scented Candles | Moy Candles",
+                    description: "Shop Moy's hand-poured scented candles: Woestyn, Sosie, Feestelik, Baka, Mymer and Roosevelt. Delivered across South Africa." },
   "/our-process": { view: "candles", tab: "moy",  title: "Our Process | How Moy Candles Are Made",
                     description: "Soy-coconut wax, wooden cross-wicks and our signature two-stage pour. See how every Moy candle is crafted by hand in South Africa." },
   "/candle-care": { view: "candles", tab: "care", title: "Candle Care Tips | Moy Candles",
@@ -1828,12 +1876,13 @@ export default function MoyApp() {
     </>
   );
 
+  const shopLook = ["shop", "refills", "cart"].includes(tab);
   return (
     <>
-      <style>{css}</style>
+      <style>{css + (shopLook ? SHOP_CSS : "")}</style>
       {searchUI}
       {toast && <div className="added-toast">{toast}</div>}
-      <div className="app">
+      <div className={"app" + (shopLook ? " shop-app" : "")}>
         <Nav />
 
         {tab === "order" && (
@@ -2038,10 +2087,7 @@ export default function MoyApp() {
         {tab === "shop" && (
           <>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: productSchema }} />
-            <div className="hdr" style={{ marginTop: 0 }}>
-              <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
-            </div>
-            <div className="sec" style={{ paddingTop: 8 }}>
+            <div className="sec">
               <div className="proc-eyebrow">Shop</div>
               <h2 className="proc-title">Light something<br /><em>Moy</em></h2>
               <p className="proc-intro" style={{ marginBottom: 24 }}>Luxury soy blend, hand-poured in small batches.</p>
@@ -2079,16 +2125,16 @@ export default function MoyApp() {
                           <div className="size-option-meta">{c.sizes[sz].burn} · {c.sizes[sz].space}</div>
                         </button>
                       ))}
-                      <button className={"size-option diffuser-option" + (sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
+                      {DIFFUSERS_AVAILABLE && <button className={"size-option diffuser-option" + (sel.isDiffuser && !sel.bundle ? " sel" : "")} onClick={() => setCandleDiffuser(c.id)}>
                         <div className="size-option-g">200ml</div>
                         <div className="size-option-price">R{DIFFUSER_PRICE}</div>
                         <div className="size-option-meta">Diffuser</div>
-                      </button>
+                      </button>}
                     </div>
 
                     <div className="bundle-head">Gift sets <span>save R{BUNDLE_DISCOUNT}</span></div>
                     <div className="bundle-picker">
-                      {Object.entries(BUNDLES).map(([bid, b]) => {
+                      {Object.entries(BUNDLES).filter(([bid]) => bundleAvailable(bid)).map(([bid, b]) => {
                         const full = priceForBundle(c.id, bid) + BUNDLE_DISCOUNT;
                         return (
                           <button key={bid} type="button" className={"bundle-option" + (sel.bundle === bid ? " sel" : "")} onClick={() => setCandleBundle(c.id, bid)}>
@@ -2120,10 +2166,7 @@ export default function MoyApp() {
 
         {tab === "refills" && (
           <>
-            <div className="hdr" style={{ marginTop: 0 }}>
-              <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
-            </div>
-            <div className="sec" style={{ paddingTop: 8 }}>
+            <div className="sec">
               <div id="refills" className="refill-section" style={{ marginTop: 0 }}>
                 <div className="proc-eyebrow">Refills</div>
                 <h2 className="proc-title">Keep the jar,<br /><em>change the scent</em></h2>
@@ -2219,14 +2262,9 @@ export default function MoyApp() {
 
         {tab === "cart" && (
           <>
-            <div className="cart-hdr" style={{ marginTop: 0 }}>
-              <div>
-                <img src="/moy-wordmark-asset (2).svg" alt="Moy Candles" className="wordmark" />
-                <div className="wordmark-sub" style={{ marginTop:3 }}>Your cart</div>
-              </div>
-              <div className="avatar">ME</div>
-            </div>
-            <div className="sec" style={{ paddingTop:24 }}>
+            <div className="sec">
+              <div className="proc-eyebrow">Cart</div>
+              <h2 className="proc-title" style={{ marginBottom: 20 }}>Your<br /><em>selection</em></h2>
               {cartCount === 0 ? (
                 <div className="cart-empty">
                   <div className="cart-empty-title">Your cart is empty</div>

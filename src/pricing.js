@@ -15,6 +15,15 @@ export const CANDLE_PRICES = {
 
 export const DIFFUSER_PRICE = 300;
 
+// ── Diffusers on/off ──
+// Diffusers are still being tested (Nov 2026). While this is false the
+// diffuser option, every gift set that contains a diffuser, and the
+// diffuser rows in the Facebook catalogue are hidden, and checkout
+// refuses them. Set to true (and push) when diffusers are ready to sell.
+export const DIFFUSERS_AVAILABLE = false;
+export const bundleAvailable = (bundleId) =>
+  Boolean(BUNDLES[bundleId]) && (DIFFUSERS_AVAILABLE || !BUNDLES[bundleId].parts.includes("diffuser"));
+
 // ── Refills ──
 // A wax insert with its own wick that drops into an existing Moy jar
 // (no jar, lid or sticker). Same 200 / 300 size keys as the candles.
@@ -63,10 +72,10 @@ export const unitsForCartItem = (item) => (item.bundle && BUNDLES[item.bundle] ?
 // Price of one cart line, or null if it isn't a real product/size.
 export const priceForCartItem = ({ candleId, size, isDiffuser, isRefill, bundle }) => {
   if (isSoldOut(candleId)) return null;
-  if (bundle) return priceForBundle(candleId, bundle);
+  if (bundle) return bundleAvailable(bundle) ? priceForBundle(candleId, bundle) : null;
   const sizes = CANDLE_PRICES[candleId];
   if (!sizes) return null;
-  if (isDiffuser) return DIFFUSER_PRICE;
+  if (isDiffuser) return DIFFUSERS_AVAILABLE ? DIFFUSER_PRICE : null;
   if (isRefill) return REFILL_PRICES[size] ?? null;
   return sizes[size] ?? null;
 };

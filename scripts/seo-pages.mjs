@@ -22,8 +22,8 @@ const pages = {
     description: "Moy Candles delivery and returns: hand-poured to order in 2 working days, courier across South Africa in 3 to 5 working days, R75 or free from 3 items. 7-day returns.",
   },
   "/shop": {
-    title: "Shop Scented Candles & Diffusers | Moy Candles",
-    description: "Shop Moy's hand-poured scented candles and reed diffusers: Sosie, Feestelik, Roosevelt, Baka, Woestyn and Mymer. Delivered across South Africa.",
+    title: "Shop Scented Candles | Moy Candles",
+    description: "Shop Moy's hand-poured scented candles: Woestyn, Sosie, Feestelik, Baka, Mymer and Roosevelt. Delivered across South Africa.",
   },
 };
 
@@ -58,7 +58,7 @@ console.log("SEO pages + sitemap written:", urls.join(", "));
 // https://houseofmoy.co.za/catalog.csv, so the Facebook Shop updates
 // itself every time the site is deployed.
 const { candles, candleOrder } = await import("../src/candles.js");
-const { DIFFUSER_PRICE, BUNDLES, priceForBundle, sizeLabel, isSoldOut } = await import("../src/pricing.js");
+const { DIFFUSER_PRICE, DIFFUSERS_AVAILABLE, BUNDLES, priceForBundle, sizeLabel, isSoldOut } = await import("../src/pricing.js");
 
 const csv = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
 const img = (p) => SITE + encodeURI(p);
@@ -77,11 +77,11 @@ for (const c of [...candles].sort((a, b) => candleOrder.indexOf(a.brand) - candl
       description: `${about} ${sizeLabel(size)} candle, about ${s.burn} burn time. ${s.space}.`,
       price: zar(s.price), image_link: img(c.img), size: sizeLabel(size), product_type: "Candles > Scented Candles" });
   }
-  rows.push({ ...base, id: `moy-${c.id}-diffuser`, title: `${c.brand} ${c.tagline} Diffuser 200ml`,
+  if (DIFFUSERS_AVAILABLE) rows.push({ ...base, id: `moy-${c.id}-diffuser`, title: `${c.brand} ${c.tagline} Diffuser 200ml`,
     description: `${about} 200ml diffuser in the ${c.brand} scent.`,
     price: zar(DIFFUSER_PRICE), image_link: img("/Diffuser.jpg"), size: "200ml", product_type: "Home Fragrance > Diffusers" });
   const trio = BUNDLES.trio;
-  rows.push({ ...base, id: `moy-${c.id}-trio`, title: `${trio.name} Gift Set: ${c.brand} ${c.tagline}`,
+  if (DIFFUSERS_AVAILABLE) rows.push({ ...base, id: `moy-${c.id}-trio`, title: `${trio.name} Gift Set: ${c.brand} ${c.tagline}`,
     description: `${trio.desc} in the ${c.brand} scent, in a gift box. ${scentLine(c)} Hand-poured in South Africa.`,
     price: zar(priceForBundle(c.id, "trio")), image_link: img(c.giftImages?.trio || c.img), size: "Gift set", product_type: "Gift Sets" });
 }
