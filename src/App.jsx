@@ -1611,7 +1611,7 @@ export default function MoyApp() {
             <span className="contact-dot">·</span>
             <a href="https://instagram.com/houseofmoyza" target="_blank" rel="noreferrer" className="contact-link">Instagram</a>
             <span className="contact-dot">·</span>
-            <a href="https://tiktok.com/@houseofmoy" target="_blank" rel="noreferrer" className="contact-link">TikTok</a>
+            <a href="https://tiktok.com/@houseofmoyza" target="_blank" rel="noreferrer" className="contact-link">TikTok</a>
             <span className="contact-dot">·</span>
             <a href="https://pinterest.com/houseofmoyza" target="_blank" rel="noreferrer" className="contact-link">Pinterest</a>
           </div>
